@@ -38,6 +38,7 @@ public class RequestUriValidator implements RequestValidator {
         }
 
         String requestDomain = ((SipURI) uri).getHost();
+        LOGGER.debug("RequestUriValidator host: " + requestDomain);
         if (!sipDomainService.isValidDomain(requestDomain)) {
             throw new RequestException(Response.BAD_REQUEST);
         }
