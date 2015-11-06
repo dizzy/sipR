@@ -37,15 +37,27 @@ public class DigestAuthenticationService implements AuthenticationService {
 
     @Override
     public String generateNonce() {
-        long time = System.currentTimeMillis();
-        long pad = new Random(System.currentTimeMillis()).nextLong();
+        long time = currentTimeInMillis();
+        long pad = getPad();
         String nonceString = (new Long(time)).toString() + (new Long(pad)).toString();
         return md5Hex(nonceString);
+    }
+
+    long currentTimeInMillis() {
+        return System.currentTimeMillis();
+    }
+
+    long getPad() {
+        return new Random(currentTimeInMillis()).nextLong();
     }
 
     @Override
     public boolean authenticate(AuthDetails authDetails, String user) {
         DigestAuthDetails details = (DigestAuthDetails) authDetails;
+
+        if (details == null) {
+            return false;
+        }
 
         if (!StringUtils.equals(details.getUsername(), user)) {
             return false;

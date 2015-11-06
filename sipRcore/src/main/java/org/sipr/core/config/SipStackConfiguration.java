@@ -18,10 +18,15 @@ import javax.sip.header.ServerHeader;
 import javax.sip.header.UserAgentHeader;
 import javax.sip.message.MessageFactory;
 import java.io.IOException;
-import java.util.Properties;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.*;
 
 @Configuration
 public class SipStackConfiguration {
+
     @Value("${sip.agent.header}")
     private String agentHeader;
 
@@ -37,8 +42,22 @@ public class SipStackConfiguration {
     @Value("${sip.listener.wss.port}")
     private int wssPort;
 
-    @Value("${sip.listener.address}")
-    private String listenerAddress;
+    @Bean(name = "networkAddresses")
+    public Set<String> networkAddresses() throws SocketException {
+        Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+        Set<String> addresses = new LinkedHashSet<>();
+        while(nets.hasMoreElements())
+        {
+            NetworkInterface netInt = nets.nextElement();
+            Enumeration<InetAddress> inetAdresses = netInt.getInetAddresses();
+            while (inetAdresses.hasMoreElements())
+            {
+                InetAddress inetAddress = inetAdresses.nextElement();
+                addresses.add(inetAddress.getHostAddress());
+            }
+        }
+        return addresses;
+    }
 
     @Bean(name = "sipProperties")
     public Properties sipProperties() throws IOException {
@@ -85,51 +104,41 @@ public class SipStackConfiguration {
         return sipFactory().createSipStack(sipProperties());
     }
 
-    @Bean
-    public ListeningPoint udpListeningPoint() throws Exception {
-        return sipStack().createListeningPoint(listenerAddress, tcpPort, "udp");
+    @Bean(name = "tcpProviders")
+    public List<SipProvider> tcpProviders() throws Exception {
+        return createSipProviders(sipStack(), networkAddresses(), tcpPort, Arrays.asList("udp", "tcp"));
     }
 
-    @Bean
-    public ListeningPoint tcpListeningPoint() throws Exception {
-        return sipStack().createListeningPoint(listenerAddress, tcpPort, "tcp");
+    @Bean(name = "tlsProviders")
+    public List<SipProvider> tlsProviders() throws Exception {
+        return createSipProviders(sipStack(), networkAddresses(), tlsPort, Collections.singletonList("tls"));
     }
 
-    @Bean
-    public ListeningPoint tlsListeningPoint() throws Exception {
-        return sipStack().createListeningPoint(listenerAddress, tlsPort, "tls");
+    @Bean(name = "wsProviders")
+    public List<SipProvider> wsProviders() throws Exception {
+        return createSipProviders(sipStack(), networkAddresses(), wsPort, Collections.singletonList("ws"));
     }
 
-    @Bean
-    public ListeningPoint wsListeningPoint() throws Exception {
-        return sipStack().createListeningPoint(listenerAddress, wsPort, "ws");
+    @Bean(name = "wssProviders")
+    public List<SipProvider> wssProviders() throws Exception {
+        return createSipProviders(sipStack(), networkAddresses(), wssPort, Collections.singletonList("wss"));
     }
 
-    @Bean
-    public ListeningPoint wssListeningPoint() throws Exception {
-        return sipStack().createListeningPoint(listenerAddress, wssPort, "wss");
-    }
-
-    @Bean(name = "tcpProvider")
-    public SipProvider tcpProvider() throws Exception {
-        SipProvider tcpProvider = sipStack().createSipProvider(udpListeningPoint());
-        tcpProvider.addListeningPoint(tcpListeningPoint());
-        return tcpProvider;
-    }
-
-    @Bean(name = "tlsProvider")
-    public SipProvider tlsProvider() throws Exception {
-        return sipStack().createSipProvider(tlsListeningPoint());
-    }
-
-    @Bean(name = "wsProvider")
-    public SipProvider wsProvider() throws Exception {
-        return sipStack().createSipProvider(wsListeningPoint());
-    }
-
-    @Bean(name = "wssProvider")
-    public SipProvider wssProvider() throws Exception {
-        return sipStack().createSipProvider(wssListeningPoint());
+    private List<SipProvider> createSipProviders(SipStack sipStack, Set<String> addresses, int port, List<String> schemas) throws Exception {
+        List<SipProvider> providers = new LinkedList<>();
+        for (String address : addresses) {
+            SipProvider provider = null;
+            for (String schema : schemas) {
+                ListeningPoint listeningPoint = sipStack.createListeningPoint(address, port, schema);
+                if (provider == null) {
+                    provider = sipStack().createSipProvider(listeningPoint);
+                } else {
+                    provider.addListeningPoint(listeningPoint);
+                }
+            }
+            providers.add(provider);
+        }
+        return providers;
     }
 
     @Bean(name = "sipUtils")

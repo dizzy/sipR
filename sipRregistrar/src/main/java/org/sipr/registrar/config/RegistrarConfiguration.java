@@ -7,24 +7,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.inject.Inject;
+import javax.annotation.Resource;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class RegistrarConfiguration {
-    @Inject
-    SipProvider tcpProvider;
+    @Resource(name="tcpProviders")
+    List<SipProvider> tcpProviders;
 
-    @Inject
-    SipProvider tlsProvider;
+    @Resource(name="tlsProviders")
+    List<SipProvider> tlsProviders;
 
-    @Inject
-    SipProvider wsProvider;
+    @Resource(name="wsProviders")
+    List<SipProvider> wsProviders;
 
-    @Inject
-    SipProvider wssProvider;
+    @Resource(name="wssProviders")
+    List<SipProvider> wssProviders;
 
     @Value("${service.registryAddress:localhost}")
     private String serviceRegistryAddress;
@@ -50,10 +52,22 @@ public class RegistrarConfiguration {
     @Bean
     public SipListener sipRRegistrarListener() throws Exception {
         SipListener sipListener = new RequestDispatcher();
-        tcpProvider.addSipListener(sipListener);
-        tlsProvider.addSipListener(sipListener);
-        wsProvider.addSipListener(sipListener);
-        wssProvider.addSipListener(sipListener);
+        for (SipProvider tcpProvider : tcpProviders) {
+            tcpProvider.addSipListener(sipListener);
+        }
+
+        for (SipProvider tlsProvider : tlsProviders) {
+            tlsProvider.addSipListener(sipListener);
+        }
+
+        for (SipProvider wsProvider : wsProviders) {
+            wsProvider.addSipListener(sipListener);
+        }
+
+        for (SipProvider wssProvider : wssProviders) {
+            wssProvider.addSipListener(sipListener);
+        }
+
         return sipListener;
     }
 
@@ -78,7 +92,7 @@ public class RegistrarConfiguration {
         NewService newService = new NewService();
         newService.setId("george2");
         newService.setName(serviceName);
-        newService.setTags(Arrays.asList("tls"));
+        newService.setTags(Collections.singletonList("tls"));
         newService.setPort(serviceTlsPort);
         newService.setAddress(serviceAddress);
         return newService;

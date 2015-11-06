@@ -2,10 +2,17 @@ package org.sipr.core.utils;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+
+import javax.sip.RequestEvent;
+import javax.sip.message.Request;
 
 import static org.junit.Assert.*;
 
 public class SipUtilsTest {
+
+    @Mock
+    RequestEvent requestEvent;
 
     @Before
     public void setUp() throws Exception {
@@ -14,7 +21,6 @@ public class SipUtilsTest {
 
     @Test
     public void testGetCallId() throws Exception {
-
     }
 
     @Test
