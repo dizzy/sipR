@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<!--				TEST SCENARIO				-->
+<!-- REGISTER a user to the SUT and then keep the binding active active -->
+<!-- by sending subsequent re-REGISTERs, before the existing binding 	-->
+<!-- expires. The loop runs forever until the test is stopped.		-->
+
+<scenario name="REGISTER">
+
+  <send retrans="1000" start_rtd="register">
+    <![CDATA[
+
+	REGISTER sip:[domain] SIP/2.0
+	Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+	From: [field0] <sip:[field1]@[domain]>;tag=[call_number]
+	To: <sip:[field1]@[domain]>
+	CSeq: [cseq] REGISTER
+	Call-ID: [call_id]
+	Contact: <sip:[field1]@[local_ip]:[local_port]>
+	Expires: [expires]
+	User-Agent: SIPp/Linux
+	Accept-Language: en
+	Max-Forwards: 70
+	Content-Length: 0
+
+    ]]>
+  </send>
+
+  <recv response="100" optional="true" rtd="register" repeat_rtd="true">  </recv>
+
+  <recv response="401" auth="true" rtd="register">  </recv>
+
+  <label id="10">  </label>
+  <send retrans="1000" start_rtd="reregister">
+    <![CDATA[
+	
+	REGISTER sip:[domain] SIP/2.0
+	Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+	From: [field0] <sip:[field1]@[domain]>;tag=[call_number]
+	To: <sip:[field1]@[domain]>
+	CSeq: [cseq] REGISTER
+	Call-ID: [call_id]
+        Contact: <sip:[field1]@[local_ip]:[local_port]>
+        Expires: [expires]
+	User-Agent: SIPp/Linux
+	Accept-Language: en
+	[field2]
+	Max-Forwards: 70
+	Content-Length: 0
+
+    ]]>
+  </send>
+
+  <recv response="100" optional="true"> </recv>
+
+  <recv response="401" auth="true" optional="true" next="10">  </recv>
+
+  <recv response="200" rtd="reregister">
+  <action>
+        <ereg regexp="[0-9]+" search_in="hdr" header="Expires:" assign_to="1" />
+        <subtract assign_to="1" value="60"/>
+	<todouble assign_to="2" variable="1"/>
+	<multiply assign_to="2" value="1000"/>
+    </action>
+  </recv>
+
+  <pause variable="2" next="10">  </pause> -->
+  <!-- <pause next="10">  </pause> -->
+
+  <ResponseTimeRepartition value="10, 20"/>
+  <CallLengthRepartition value="10"/>
+</scenario>

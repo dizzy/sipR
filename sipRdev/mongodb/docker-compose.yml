@@ -1,0 +1,12 @@
+sipRmongodb:
+  image: mongo:latest
+  command: "--smallfiles"
+  ports:
+   - "27017:27017"
+sipRconsul:
+  image: gliderlabs/consul-server
+  command: -node siprconsul -bootstrap -client 0.0.0.0 -domain sipr
+  ports:
+  - "8400:8400"
+  - "8500:8500"
+  - "8600:8600"

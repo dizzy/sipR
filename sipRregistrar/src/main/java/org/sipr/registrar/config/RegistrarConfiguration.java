@@ -13,6 +13,7 @@ import javax.sip.SipProvider;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Configuration
 public class RegistrarConfiguration {
@@ -79,7 +80,7 @@ public class RegistrarConfiguration {
     @Bean
     public NewService serviceTcp() {
         NewService newService = new NewService();
-        newService.setId("george1");
+        newService.setId("tcp-" + UUID.randomUUID().toString());
         newService.setName(serviceName);
         newService.setTags(Arrays.asList("tcp", "udp"));
         newService.setPort(serviceTcpPort);
@@ -90,7 +91,7 @@ public class RegistrarConfiguration {
     @Bean
     public NewService serviceTls() {
         NewService newService = new NewService();
-        newService.setId("george2");
+        newService.setId("tls-" + UUID.randomUUID().toString());
         newService.setName(serviceName);
         newService.setTags(Collections.singletonList("tls"));
         newService.setPort(serviceTlsPort);

@@ -53,7 +53,9 @@ public class SipStackConfiguration {
             while (inetAdresses.hasMoreElements())
             {
                 InetAddress inetAddress = inetAdresses.nextElement();
-                addresses.add(inetAddress.getHostAddress());
+                if (!inetAddress.isLoopbackAddress()) {
+                    addresses.add(inetAddress.getHostAddress());
+                }
             }
         }
         return addresses;
