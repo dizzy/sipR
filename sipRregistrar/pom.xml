@@ -83,12 +83,25 @@
         <profile>
             <id>mongodb</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.sipr</groupId>
                     <artifactId>siprmongodb</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>couchdb</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.sipr</groupId>
+                    <artifactId>siprcouchdb</artifactId>
                     <version>1.0-SNAPSHOT</version>
                 </dependency>
             </dependencies>

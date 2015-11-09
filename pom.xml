@@ -10,6 +10,7 @@
         <module>sipRcore</module>
         <module>sipRservice</module>
         <module>sipRregistrar</module>
+        <module>sipRcouchDB</module>
         <module>sipRmongodb</module>
     </modules>
 
