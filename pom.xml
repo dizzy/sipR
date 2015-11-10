@@ -12,6 +12,7 @@
         <module>sipRregistrar</module>
         <module>sipRcouchDB</module>
         <module>sipRmongodb</module>
+        <module>sipRjpa</module>
     </modules>
 
     <name>sipR SIP project</name>
