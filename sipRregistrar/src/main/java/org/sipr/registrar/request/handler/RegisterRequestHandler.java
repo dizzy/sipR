@@ -70,10 +70,8 @@ public class RegisterRequestHandler extends UntypedActor {
             sipMessageSender.sendResponse(requestEvent, Response.OK, createResponseHeaders(bindings));
 
         } catch (RequestException ex) {
-            LOGGER.error(" req ex :::: " + ex.getStackTrace());
             sipMessageSender.sendResponse(requestEvent, ex.getErrorCode(), ex.getHeaders());
         } catch (ParseException | InvalidArgumentException pex) {
-            LOGGER.error(" pex ex :::: " + pex.getStackTrace());
             sipMessageSender.sendResponse(requestEvent, Response.SERVER_INTERNAL_ERROR);
         }
     }
