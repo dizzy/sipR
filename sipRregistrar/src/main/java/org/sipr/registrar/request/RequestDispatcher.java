@@ -1,9 +1,7 @@
 package org.sipr.registrar.request;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.InvalidActorNameException;
 import org.sipr.core.utils.SipUtils;
+import org.sipr.registrar.request.handler.RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import javax.inject.Inject;
 import javax.sip.*;
 
 import static java.lang.String.format;
-import static org.sipr.core.SpringExtension.SpringExtProvider;
 
 public class RequestDispatcher implements SipListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestDispatcher.class);
@@ -30,18 +27,13 @@ public class RequestDispatcher implements SipListener {
         String callId = sipUtils.getCallId(requestEvent);
         String requestMethod = sipUtils.getRequestMethod(requestEvent);
         LOGGER.debug(format("Process Request Call Id=%s, method=%s", callId, requestMethod));
-        try {
-            ActorSystem system = applicationContext.getBean(ActorSystem.class);
-            ActorRef requestActor = system.actorOf(SpringExtProvider.get(system).props(format(PROCESSOR, requestMethod.toLowerCase())), callId);
-            requestActor.tell(requestEvent, null);
-        } catch (InvalidActorNameException nex) {
-            LOGGER.info("callId request already procesing " + callId);
-        }
+        RequestHandler handler = (RequestHandler) applicationContext.getBean(format(PROCESSOR, requestMethod.toLowerCase()));
+        handler.handle(requestEvent);
     }
 
     @Override
     public void processResponse(ResponseEvent responseEvent) {
-        LOGGER.info("PROCESSS RESPONSE :::::::::::" + responseEvent.getResponse().toString());
+        LOGGER.info(responseEvent.getResponse().toString());
     }
 
     @Override

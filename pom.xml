@@ -53,13 +53,6 @@
                 <version>1.2.245</version>
             </dependency>
 
-            <!-- AKKA -->
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-actor_2.11</artifactId>
-                <version>2.3.14</version>
-            </dependency>
-
             <!-- commons libs -->
             <dependency>
                 <groupId>org.apache.commons</groupId>

@@ -1,10 +1,11 @@
-package org.sipr.registrar.request.handler;
+package org.sipr.registrar.request.handler.impl;
 
-import akka.actor.UntypedActor;
 import gov.nist.javax.sip.address.AddressImpl;
 import gov.nist.javax.sip.address.GenericURI;
 import org.sipr.core.domain.RegistrationBinding;
 import org.sipr.core.service.SipMessageSender;
+import org.sipr.registrar.request.handler.RequestException;
+import org.sipr.registrar.request.handler.RequestHandler;
 import org.sipr.registrar.request.processor.RequestProcessor;
 import org.sipr.registrar.request.validator.RequestValidator;
 import org.slf4j.Logger;
@@ -27,11 +28,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
-import static java.lang.String.format;
-
 @Component("registerHandler")
 @Scope("prototype")
-public class RegisterRequestHandler extends UntypedActor {
+public class RegisterRequestHandler implements RequestHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterRequestHandler.class);
 
     @Inject
@@ -46,19 +45,7 @@ public class RegisterRequestHandler extends UntypedActor {
     @Inject
     HeaderFactory headerFactory;
 
-    @Override
-    public void onReceive(Object message) throws Exception {
-        LOGGER.debug(format("Enter actor register processing %s", self().path().name()));
-
-        if (message instanceof RequestEvent) {
-            processRequestEvent((RequestEvent) message);
-        }
-
-        LOGGER.debug(format("Exit actor register processing %s", self().path().name()));
-        getContext().stop(self());
-    }
-
-    void processRequestEvent(RequestEvent requestEvent) {
+    public void handle(RequestEvent requestEvent) {
         try {
 
             // run request through valiator chain
