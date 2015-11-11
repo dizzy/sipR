@@ -1,9 +1,8 @@
-package org.sipr.jpa.service;
+package org.sipr.cassandra.service;
 
+import org.sipr.cassandra.dao.CassandraRegistrationsRepository;
+import org.sipr.cassandra.domain.CassandraRegistrationBinding;
 import org.sipr.core.service.RegistrationBindingsService;
-import org.sipr.jpa.dao.JpaRegistrationsRepository;
-import org.sipr.jpa.domain.JpaRegistrationBinding;
-import org.sipr.jpa.domain.JpaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,14 +14,13 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toMap;
 
 @Component
-public class RegistrationBindingsServiceImpl implements RegistrationBindingsService<JpaRegistrationBinding> {
+public class RegistrationBindingsServiceImpl implements RegistrationBindingsService<CassandraRegistrationBinding> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationBindingsServiceImpl.class);
 
     @Inject
-    JpaRegistrationsRepository registrationsRepository;
+    CassandraRegistrationsRepository registrationsRepository;
 
     @Override
     public void deleteAllBindings(String userName) {
@@ -31,37 +29,37 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public void deleteBindings(List<JpaRegistrationBinding> bindings) {
+    public void deleteBindings(List<CassandraRegistrationBinding> bindings) {
         registrationsRepository.delete(bindings);
     }
 
     @Override
-    public void saveBindings(List<JpaRegistrationBinding> bindings) {
+    public void saveBindings(List<CassandraRegistrationBinding> bindings) {
         registrationsRepository.save(bindings);
     }
 
     @Override
-    public Map<String, JpaRegistrationBinding> findByUserName(String userName) {
-        List<JpaRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
+    public Map<String, CassandraRegistrationBinding> findByUserName(String userName) {
+        List<CassandraRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
         Map registrations = new HashMap<>();
-        for (JpaRegistrationBinding binding : bindings) {
+        for (CassandraRegistrationBinding binding : bindings) {
             registrations.put(binding.getContact(), binding);
         }
         return registrations;
     }
 
     @Override
-    public void deleteBinding(JpaRegistrationBinding binding) {
+    public void deleteBinding(CassandraRegistrationBinding binding) {
         registrationsRepository.delete(Collections.singletonList(binding));
     }
 
     @Override
-    public void saveBinding(JpaRegistrationBinding binding) {
+    public void saveBinding(CassandraRegistrationBinding binding) {
         registrationsRepository.save(binding);
     }
 
     @Override
-    public JpaRegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
-        return new JpaRegistrationBinding(user, contactUri, callId, cseq, expires);
+    public CassandraRegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
+        return new CassandraRegistrationBinding(user, contactUri, callId, cseq, expires);
     }
 }

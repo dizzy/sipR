@@ -10,8 +10,6 @@ public interface RegistrationBindingsService<RegistrationBinding> {
 
     void saveBindings(List<RegistrationBinding> bindings);
 
-    List<RegistrationBinding> findByContact(String contact);
-
     Map<String, RegistrationBinding> findByUserName(String userName);
 
     void deleteBinding(RegistrationBinding binding);

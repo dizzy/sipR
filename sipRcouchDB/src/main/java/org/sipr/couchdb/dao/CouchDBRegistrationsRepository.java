@@ -48,13 +48,6 @@ public class CouchDBRegistrationsRepository extends CouchDbRepositorySupport<Cou
         return regBindings;
     }
 
-    @Override
-    @GenerateView
-    public List<CouchDBRegistrationBinding> findByContact(String contact) {
-        List<CouchDBRegistrationBinding> regBindings = queryView("by_contact", contact);
-        return regBindings;
-    }
-
     public void deleteBinding(CouchDBRegistrationBinding binding) {
         remove(binding);
     }

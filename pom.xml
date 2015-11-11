@@ -13,6 +13,7 @@
         <module>sipRcouchDB</module>
         <module>sipRmongodb</module>
         <module>sipRjpa</module>
+        <module>sipRcassandra</module>
     </modules>
 
     <name>sipR SIP project</name>

@@ -41,11 +41,6 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public List<MongoRegistrationBinding> findByContact(String contact) {
-        return registrationsRepository.findByContact(contact);
-    }
-
-    @Override
     public Map<String, MongoRegistrationBinding> findByUserName(String userName) {
         List<MongoRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
         Map registrations = new HashMap<>();
