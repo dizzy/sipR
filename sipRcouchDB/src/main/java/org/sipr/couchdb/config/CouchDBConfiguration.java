@@ -18,7 +18,6 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource(value= "classpath:couchdb.properties", ignoreResourceNotFound = true)
-@Profile("couchdb")
 public class CouchDBConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouchDBConfiguration.class);
 

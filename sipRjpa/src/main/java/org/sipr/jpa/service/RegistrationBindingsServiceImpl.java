@@ -48,10 +48,11 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     @Override
     public Map<String, JpaRegistrationBinding> findByUserName(String userName) {
         List<JpaRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
-        if (bindings != null && !bindings.isEmpty()) {
-            return bindings.stream().collect(toMap(JpaRegistrationBinding::getContact, (p) -> p));
+        Map registrations = new HashMap<>();
+        for (JpaRegistrationBinding binding : bindings) {
+            registrations.put(binding.getContact(), binding);
         }
-        return new HashMap<>();
+        return registrations;
     }
 
     @Override
@@ -66,6 +67,6 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
 
     @Override
     public JpaRegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
-        return new JpaRegistrationBinding(new JpaUser(user), contactUri, callId, cseq, expires);
+        return new JpaRegistrationBinding(user, contactUri, callId, cseq, expires);
     }
 }

@@ -48,10 +48,11 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     @Override
     public Map<String, MongoRegistrationBinding> findByUserName(String userName) {
         List<MongoRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
-        if (bindings != null && !bindings.isEmpty()) {
-            return bindings.stream().collect(toMap(MongoRegistrationBinding::getContact, (p) -> p));
+        Map registrations = new HashMap<>();
+        for (MongoRegistrationBinding binding : bindings) {
+            registrations.put(binding.getContact(), binding);
         }
-        return new HashMap<>();
+        return registrations;
     }
 
     @Override

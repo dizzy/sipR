@@ -14,23 +14,24 @@ public class JpaRegistrationBinding implements RegistrationBinding {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    JpaUser user;
-
+    String userName;
     String contact;
     String callId;
     Long cSeq;
     Integer expires;
 
-    public JpaRegistrationBinding(JpaUser user, String contact, String callId, long cseq, int expires) {
-        this.user = user;
+    public JpaRegistrationBinding() {
+    }
+
+    public JpaRegistrationBinding(String userName, String contact, String callId, long cseq, int expires) {
+        this.userName = userName;
         this.contact = contact;
         this.callId = callId;
         this.cSeq = cseq;
         this.expires = expires;
     }
     public String getUserName() {
-        return user.getUserName();
+        return userName;
     }
 
     public long getCseq() {
@@ -53,9 +54,7 @@ public class JpaRegistrationBinding implements RegistrationBinding {
 
     @Override
     public void setUserName(String userName) {
-        if (user != null) {
-            user.setUserName(userName);
-        }
+        this.userName = userName;
     }
 
     public String getContact() {

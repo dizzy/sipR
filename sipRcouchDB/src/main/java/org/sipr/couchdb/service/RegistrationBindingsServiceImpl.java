@@ -46,10 +46,11 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     @Override
     public Map<String, CouchDBRegistrationBinding> findByUserName(String userName) {
         List<CouchDBRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
-        if (bindings != null && !bindings.isEmpty()) {
-            return bindings.stream().collect(toMap(CouchDBRegistrationBinding::getContact, (p) -> p));
+        Map registrations = new HashMap<>();
+        for (CouchDBRegistrationBinding binding : bindings) {
+            registrations.put(binding.getContact(), binding);
         }
-        return new HashMap<>();
+        return registrations;
     }
 
     @Override
