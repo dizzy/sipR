@@ -10,7 +10,6 @@ import org.sipr.registrar.request.processor.RequestProcessor;
 import org.sipr.registrar.request.validator.RequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -29,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 
 @Component("registerHandler")
-@Scope("prototype")
 public class RegisterRequestHandler implements RequestHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterRequestHandler.class);
 
