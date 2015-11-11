@@ -1,18 +1,19 @@
 package org.sipr.cassandra.domain;
 
 import org.sipr.core.domain.RegistrationBinding;
+import org.springframework.cassandra.core.PrimaryKeyType;
 import org.springframework.data.cassandra.mapping.Column;
 import org.springframework.data.cassandra.mapping.PrimaryKey;
+import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.mapping.Table;
 
 @Table(value = "registrations")
 public class CassandraRegistrationBinding implements RegistrationBinding {
 
-    @PrimaryKey
-    @Column("username")
+    @PrimaryKeyColumn(name = "username", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
     String userName;
 
-    @Column("contact")
+    @PrimaryKeyColumn(name = "contact", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
     String contact;
 
     @Column("call_id")
