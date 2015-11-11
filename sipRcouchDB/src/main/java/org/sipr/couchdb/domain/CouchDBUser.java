@@ -2,7 +2,6 @@ package org.sipr.couchdb.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.ektorp.support.CouchDbDocument;
-import org.ektorp.support.TypeDiscriminator;
 import org.sipr.core.domain.User;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -10,7 +9,6 @@ public class CouchDBUser extends CouchDbDocument implements User {
 
     String userName;
 
-    @TypeDiscriminator
     String sipPassword;
 
     public CouchDBUser() {

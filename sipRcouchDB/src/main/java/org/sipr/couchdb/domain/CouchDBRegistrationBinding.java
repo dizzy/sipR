@@ -2,7 +2,6 @@ package org.sipr.couchdb.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.ektorp.support.CouchDbDocument;
-import org.ektorp.support.TypeDiscriminator;
 import org.sipr.core.domain.RegistrationBinding;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,7 +11,6 @@ public class CouchDBRegistrationBinding extends CouchDbDocument implements Regis
 
     String contact;
 
-    @TypeDiscriminator
     String callId;
 
     long cseq;

@@ -24,20 +24,42 @@ public class CouchDBConfiguration {
     @Value("${couchdb.uri}")
     String uri;
 
-    @Value("${couchdb.database.name}")
-    String dbName;
+    @Value("${couchdb.user.database.name}")
+    String userDbName;
+
+    @Value("${couchdb.bindings.database.name}")
+    String bindingsDbName;
 
     @Bean
-    public CouchDbConnector couchDBConnector() {
-        LOGGER.info("Create couchDB connector");
+    public HttpClient couchDBHttpClient() {
         HttpClient httpClient = null;
-        CouchDbConnector db = null;
         try {
             httpClient = new StdHttpClient.Builder()
                     .url(uri)
                     .build();
-            CouchDbInstance dbInstance = new StdCouchDbInstance(httpClient);
-            db = new StdCouchDbConnector(dbName, dbInstance);
+        } catch (Exception e) {
+            LOGGER.error("Cannot create HTTP Client");
+            return null;
+        }
+        return httpClient;
+    }
+
+    @Bean
+    public CouchDbConnector couchDBUserConnector() {
+        return couchDBConnector(userDbName);
+    }
+
+    @Bean
+    public CouchDbConnector couchDBBindingsConnector() {
+        return couchDBConnector(bindingsDbName);
+    }
+
+    private CouchDbConnector couchDBConnector(String databaseName) {
+        LOGGER.info("Create couchDB connector");
+        CouchDbConnector db = null;
+        try {
+            CouchDbInstance dbInstance = new StdCouchDbInstance(couchDBHttpClient());
+            db = new StdCouchDbConnector(databaseName, dbInstance);
 
             db.createDatabaseIfNotExists();
         } catch (Exception e) {
@@ -49,11 +71,11 @@ public class CouchDBConfiguration {
 
     @Bean
     public CouchDBRegistrationsRepository registrationsRepository() {
-        return new CouchDBRegistrationsRepository(couchDBConnector());
+        return new CouchDBRegistrationsRepository(couchDBBindingsConnector());
     }
 
     @Bean
     public CouchDBUserRepository usersRepository() {
-        return new CouchDBUserRepository(couchDBConnector());
+        return new CouchDBUserRepository(couchDBUserConnector());
     }
 }
