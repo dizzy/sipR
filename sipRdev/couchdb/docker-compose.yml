@@ -1,4 +1,5 @@
 sipRcouchdb:
+  container_name: sipRcouchdb
   image: fedora/couchdb
   ports:
      - "5984:5984"

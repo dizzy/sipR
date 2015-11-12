@@ -1,4 +1,5 @@
 sipRmongodb:
+  container_name: sipRmongodb
   image: mongo:latest
   command: "--smallfiles"
   ports:
