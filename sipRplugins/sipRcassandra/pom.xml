@@ -11,6 +11,7 @@
 
     <groupId>org.sipr</groupId>
     <artifactId>siprcassandra</artifactId>
+    <name>sipR cassandra plugin</name>
 
     <dependencies>
         <dependency>

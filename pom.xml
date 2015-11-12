@@ -10,10 +10,7 @@
         <module>sipRcore</module>
         <module>sipRservice</module>
         <module>sipRregistrar</module>
-        <module>sipRcouchDB</module>
-        <module>sipRmongodb</module>
-        <module>sipRjpa</module>
-        <module>sipRcassandra</module>
+        <module>sipRplugins</module>
     </modules>
 
     <name>sipR SIP project</name>
