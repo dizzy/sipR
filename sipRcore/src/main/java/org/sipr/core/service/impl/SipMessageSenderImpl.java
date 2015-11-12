@@ -47,7 +47,7 @@ public class SipMessageSenderImpl implements SipMessageSender {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Failed to process registrar message" + e.getMessage());
+            LOGGER.error("Failed to process message" + e.getMessage());
         }
     }
 }

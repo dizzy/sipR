@@ -9,7 +9,7 @@
     <modules>
         <module>sipRcore</module>
         <module>sipRservice</module>
-        <module>sipRregistrar</module>
+        <module>sipRserver</module>
         <module>sipRplugins</module>
     </modules>
 
