@@ -2,7 +2,7 @@ package org.sipr.config;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
-import org.sipr.request.RequestDispatcher;
+import org.sipr.SipRListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,7 +52,7 @@ public class ServerConfiguration {
 
     @Bean
     public SipListener sipRServerListener() throws Exception {
-        SipListener sipListener = new RequestDispatcher();
+        SipListener sipListener = new SipRListener();
         for (SipProvider tcpProvider : tcpProviders) {
             tcpProvider.addSipListener(sipListener);
         }

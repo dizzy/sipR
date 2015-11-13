@@ -1,6 +1,6 @@
 package org.sipr.request.validator.impl;
 
-import org.sipr.request.handler.RequestException;
+import org.sipr.request.processor.RequestException;
 import org.sipr.request.validator.RequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

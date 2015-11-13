@@ -1,10 +1,8 @@
-package org.sipr.request.handler;
+package org.sipr.request.processor;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-public class SubscribeRequestHandlerTest {
+public class RegisterRequestProcessorTest {
 
     @Test
     public void testOnReceive() throws Exception {
@@ -13,6 +11,11 @@ public class SubscribeRequestHandlerTest {
 
     @Test
     public void testProcessRequestEvent() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateResponseHeaders() throws Exception {
 
     }
 }

@@ -1,4 +1,4 @@
-package org.sipr.request.handler;
+package org.sipr.request.processor;
 
 import javax.sip.header.Header;
 import java.util.List;

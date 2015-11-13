@@ -1,39 +1,50 @@
-package org.sipr.request;
+package org.sipr;
 
 import org.sipr.core.utils.SipUtils;
-import org.sipr.request.handler.RequestHandler;
+import org.sipr.request.processor.RequestProcessor;
+import org.sipr.response.processor.ResponseProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.sip.*;
 
-import static java.lang.String.format;
+import java.util.List;
+import java.util.Map;
 
-public class RequestDispatcher implements SipListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RequestDispatcher.class);
-    private static final String PROCESSOR = "%sHandler";
+import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.upperCase;
 
-    @Autowired
-    ApplicationContext applicationContext;
+public class SipRListener implements SipListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SipRListener.class);
 
     @Inject
     SipUtils sipUtils;
 
+    @Inject
+    List<RequestProcessor> requestProcessors;
+
+    @Inject
+    ResponseProcessor responseProcessor;
+
+    Map<String, RequestProcessor> requestHandlersMap;
+
+    @PostConstruct
+    void init() {
+        requestHandlersMap = requestProcessors.stream().collect(toMap(RequestProcessor::getRequestType, (r) -> r));
+    }
+
     @Override
     public void processRequest(RequestEvent requestEvent) {
-        String callId = sipUtils.getCallId(requestEvent);
         String requestMethod = sipUtils.getRequestMethod(requestEvent);
-        LOGGER.debug(format("Process Request Call Id=%s, method=%s", callId, requestMethod));
-        RequestHandler handler = (RequestHandler) applicationContext.getBean(format(PROCESSOR, requestMethod.toLowerCase()));
-        handler.handle(requestEvent);
+        requestHandlersMap.get(upperCase(requestMethod)).processEvent(requestEvent);
     }
 
     @Override
     public void processResponse(ResponseEvent responseEvent) {
         LOGGER.info(responseEvent.getResponse().toString());
+        responseProcessor.processEvent(responseEvent);
     }
 
     @Override
