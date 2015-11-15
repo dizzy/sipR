@@ -1,12 +1,20 @@
 package org.sipr.mongodb.domain;
 
 import org.sipr.core.domain.RegistrationBinding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
 @Document(collection = "registrations")
 public class MongoRegistrationBinding implements RegistrationBinding {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoRegistrationBinding.class);
+
     @Id
     String id;
 
@@ -19,12 +27,15 @@ public class MongoRegistrationBinding implements RegistrationBinding {
     long cseq;
     int expires;
 
+    @Indexed(name = "expireAt", expireAfterSeconds = 0)
+    Date expireAt;
+
     public MongoRegistrationBinding(String userName, String contact, String callId, long cseq, int expires) {
         this.userName = userName;
         this.contact = contact;
         this.callId = callId;
         this.cseq = cseq;
-        this.expires = expires;
+        setExpires(expires);
     }
 
     public String getUserName() {
@@ -65,6 +76,7 @@ public class MongoRegistrationBinding implements RegistrationBinding {
 
     public void setExpires(int expires) {
         this.expires = expires;
+        expireAt = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(5 + expires).toInstant());
     }
 
 }
