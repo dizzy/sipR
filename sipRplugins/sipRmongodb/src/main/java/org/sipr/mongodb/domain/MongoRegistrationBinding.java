@@ -1,8 +1,6 @@
 package org.sipr.mongodb.domain;
 
 import org.sipr.core.domain.RegistrationBinding;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,8 +11,6 @@ import java.util.Date;
 
 @Document(collection = "registrations")
 public class MongoRegistrationBinding implements RegistrationBinding {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MongoRegistrationBinding.class);
-
     @Id
     String id;
 
