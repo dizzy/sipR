@@ -1,6 +1,6 @@
 sipRcassandra:
   container_name: sipRcassandra
-  image: cassandra:latest
+  image: cassandra:2.2.3
   ports:
      - "9042:9042"
 sipRconsul:
