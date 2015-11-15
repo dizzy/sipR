@@ -5,6 +5,9 @@ import org.sipr.cassandra.domain.CassandraRegistrationBinding;
 import org.sipr.core.service.RegistrationBindingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cassandra.core.WriteOptions;
+import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -22,6 +25,9 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     @Inject
     CassandraRegistrationsRepository registrationsRepository;
 
+    @Autowired
+    CassandraTemplate cassandraTemplate;
+
     @Override
     public void deleteAllBindings(String userName) {
         Long deleted = registrationsRepository.deleteByUserName(userName);
@@ -35,7 +41,9 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
 
     @Override
     public void saveBindings(List<CassandraRegistrationBinding> bindings) {
-        registrationsRepository.save(bindings);
+        for (CassandraRegistrationBinding binding : bindings) {
+            saveBinding(binding);
+        }
     }
 
     @Override
@@ -55,7 +63,11 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
 
     @Override
     public void saveBinding(CassandraRegistrationBinding binding) {
-        registrationsRepository.save(binding);
+        // TODO use TTL repository support when available
+        // workaround lack of TTL support in spring data repository, use template to insert with TTL
+        WriteOptions options = new WriteOptions();
+        options.setTtl(binding.getExpires() + 5);
+        cassandraTemplate.insert(binding, options);
     }
 
     @Override
