@@ -5,10 +5,3 @@ sipRmysql:
   - MYSQL_ROOT_PASSWORD=sipRmysql
   ports:
    - "3306:3306"
-sipRconsul:
-  image: gliderlabs/consul-server
-  command: -node siprconsul -bootstrap -client 0.0.0.0 -domain sipr
-  ports:
-  - "8400:8400"
-  - "8500:8500"
-  - "8600:8600"
