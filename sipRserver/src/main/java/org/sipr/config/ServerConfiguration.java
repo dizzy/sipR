@@ -41,6 +41,12 @@ public class ServerConfiguration {
     @Value("${sip.listener.tls.port}")
     private Integer serviceTlsPort;
 
+    @Value("${sip.listener.ws.port}")
+    private Integer serviceWsPort;
+
+    @Value("${sip.listener.wss.port}")
+    private Integer serviceWssPort;
+
     @Value("${service.checkUrl}")
     private String serviceURLCheck;
 
@@ -95,6 +101,26 @@ public class ServerConfiguration {
         newService.setName(serviceName);
         newService.setTags(Collections.singletonList("tls"));
         newService.setPort(serviceTlsPort);
+        newService.setAddress(serviceAddress);
+        return newService;
+    }
+
+    @Bean
+    public NewService serviceWs() {
+        NewService newService = new NewService();
+        newService.setId("ws-" + UUID.randomUUID().toString());
+        newService.setName("ws");
+        newService.setPort(serviceWsPort);
+        newService.setAddress(serviceAddress);
+        return newService;
+    }
+
+    @Bean
+    public NewService serviceWss() {
+        NewService newService = new NewService();
+        newService.setId("wss-" + UUID.randomUUID().toString());
+        newService.setName("wss");
+        newService.setPort(serviceWssPort);
         newService.setAddress(serviceAddress);
         return newService;
     }
