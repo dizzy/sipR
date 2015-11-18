@@ -1,7 +1,8 @@
 sipRlogstash:
   container_name: sipRlogstash
   image: logstash:latest
-  links: sipRelastic
+  links:
+  - sipRelastic
   volumes:
   - ./logstash-conf:/config-dir
   command: "-f /config-dir/logstash-syslog.conf"
@@ -9,7 +10,8 @@ sipRlogstash:
    - "9999:9999"
 sipRkibana:
   image: kibana:4.1
-  links: sipRelastic:elasticsearch
+  links:
+  - sipRelastic:elasticsearch
   container_name: sipRkibana
   ports:
   - "5601:5601"
