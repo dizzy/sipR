@@ -10,7 +10,6 @@
         <destination>127.0.0.1:9999</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <fieldNames>
-                <timestamp>[ignore]</timestamp>
                 <version>[ignore]</version>
                 <message>message</message>
             </fieldNames>
