@@ -8,6 +8,4 @@ public interface SipAuthenticationService {
     boolean authenticateRequest(Request request);
 
     WWWAuthenticateHeader createAuthHeader() throws ParseException;
-
-    String extractUserFromToHeader(Request request);
 }

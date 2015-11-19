@@ -20,7 +20,7 @@ public class ByeRequestProcessor implements RequestProcessor {
 
     @Override
     public void processEvent(RequestEvent requestEvent) {
-        sipMessageSender.sendResponse(requestEvent, Response.NOT_IMPLEMENTED);
+        sipMessageSender.sendResponse(requestEvent, Response.OK);
     }
 
     @Override

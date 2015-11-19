@@ -2,7 +2,7 @@ package org.sipr.request.handler.impl;
 
 import org.sipr.core.domain.RegistrationBinding;
 import org.sipr.core.service.RegistrationBindingsService;
-import org.sipr.core.service.SipAuthenticationService;
+import org.sipr.core.utils.SipUtils;
 import org.sipr.request.processor.RequestException;
 import org.sipr.request.handler.RegistrationHandler;
 import org.slf4j.Logger;
@@ -20,8 +20,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 import java.util.*;
 
-import static org.apache.commons.collections4.IteratorUtils.toList;
-
 @Component
 public class RegistrationHandlerImpl implements RegistrationHandler {
 
@@ -34,13 +32,13 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
     RegistrationBindingsService registrationService;
 
     @Inject
-    SipAuthenticationService sipAuthenticationService;
+    SipUtils sipUtils;
 
     @Override
     public Collection<RegistrationBinding> handleRequest(RequestEvent requestEvent) throws RequestException {
         Request request = requestEvent.getRequest();
-        String user = sipAuthenticationService.extractUserFromToHeader(request);
-        List<ContactHeader> headers = extractContactHeaders(request);
+        String user = sipUtils.extractAuthUser(request);
+        List<ContactHeader> headers = sipUtils.extractContactHeaders(request);
         List<RegistrationBinding> bindingsToDelete = new ArrayList<>();
         List<RegistrationBinding> bindingsToSave = new ArrayList<>();
         Map<String, RegistrationBinding> currentBindings = registrationService.findByUserName(user);
@@ -48,7 +46,7 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
         ExpiresHeader expiresHeader = (ExpiresHeader) request.getHeader(ExpiresHeader.NAME);
 
         boolean deleteAllBindings = false;
-        if (containsWildCardHeader(headers)) {
+        if (sipUtils.containsWildCardHeader(headers)) {
 
             if (headers.size() != 1 || expiresHeader == null || expiresHeader.getExpires() != 0) {
                 throw new RequestException(Response.BAD_REQUEST);
@@ -106,22 +104,4 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
         return currentBindings.values();
     }
 
-    List<ContactHeader> extractContactHeaders(Request request) {
-        ListIterator<ContactHeader> headers = request.getHeaders(ContactHeader.NAME);
-        if (headers != null) {
-            return toList(headers);
-        }
-        return null;
-    }
-
-    boolean containsWildCardHeader(List<ContactHeader> headers) {
-        if (headers != null) {
-            for (ContactHeader contactHeader : headers) {
-                if (contactHeader.isWildCard()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }

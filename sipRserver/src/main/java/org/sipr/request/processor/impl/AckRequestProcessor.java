@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.sip.RequestEvent;
+import javax.sip.*;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -20,7 +20,20 @@ public class AckRequestProcessor implements RequestProcessor {
 
     @Override
     public void processEvent(RequestEvent requestEvent) {
-        sipMessageSender.sendResponse(requestEvent, Response.NOT_IMPLEMENTED);
+        try {
+            SipProvider sipProvider = (SipProvider) requestEvent.getSource();
+            ServerTransaction st = requestEvent.getServerTransaction();
+            Dialog dialog = st.getDialog();
+            if (dialog.getState() == DialogState.CONFIRMED) {
+                Request byeRequest = dialog.createRequest(Request.BYE);
+                ClientTransaction tr = sipProvider.getNewClientTransaction(byeRequest);
+                dialog.sendRequest(tr);
+            }
+        } catch (SipException ex) {
+            LOGGER.error("Exception while processing ACK " + ex.getStackTrace());
+            sipMessageSender.sendResponse(requestEvent, Response.SERVER_INTERNAL_ERROR);
+        }
+
     }
 
     @Override

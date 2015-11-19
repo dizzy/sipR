@@ -1,6 +1,5 @@
 package org.sipr.core.service.impl;
 
-import gov.nist.javax.sip.address.SipUri;
 import org.sipr.core.domain.AuthDetails;
 import org.sipr.core.service.AuthenticationService;
 import org.sipr.core.service.SipAuthenticationService;
@@ -8,10 +7,8 @@ import org.sipr.core.utils.SipUtils;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.sip.address.Address;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.HeaderFactory;
-import javax.sip.header.ToHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import java.text.ParseException;
@@ -30,7 +27,7 @@ public class SipDigestAuthenticationService implements SipAuthenticationService 
 
     @Override
     public boolean authenticateRequest(Request request) {
-        return authenticationService.authenticate(createAuthDetails(request), extractUserFromToHeader(request));
+        return authenticationService.authenticate(createAuthDetails(request), sipUtils.extractAuthUser(request));
     }
 
     @Override
@@ -42,17 +39,6 @@ public class SipDigestAuthenticationService implements SipAuthenticationService 
         wwwAuthenticateHeader.setParameter("stale", "FALSE");
         wwwAuthenticateHeader.setParameter("algorithm", authenticationService.getAlgorithm());
         return wwwAuthenticateHeader;
-    }
-
-    @Override
-    public String extractUserFromToHeader(Request request) {
-        ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
-        Address address = toHeader.getAddress();
-        SipUri sipUri = (SipUri) sipUtils.getCanonicalizedURI(address.getURI());
-        sipUri.clearPassword();
-        sipUri.removePort();
-        sipUri.clearQheaders();
-        return sipUri.getUser();
     }
 
     AuthDetails createAuthDetails(Request request) {
