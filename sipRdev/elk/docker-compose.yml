@@ -7,6 +7,7 @@ sipRlogstash:
   - ./logstash-conf:/config-dir
   command: "-f /config-dir/logstash-syslog.conf"
   ports:
+   - "9998:9998"
    - "9999:9999"
 sipRkibana:
   image: kibana:4.1
