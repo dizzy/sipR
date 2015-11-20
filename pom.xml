@@ -11,6 +11,8 @@
         <module>sipRservice</module>
         <module>sipRserver</module>
         <module>sipRplugins</module>
+        <module>sipRcollector</module>
+        <module>sipRutils</module>
     </modules>
 
     <name>sipR SIP project</name>

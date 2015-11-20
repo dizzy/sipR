@@ -3,7 +3,7 @@ package org.sipr.core.service.impl;
 import org.sipr.core.domain.AuthDetails;
 import org.sipr.core.service.AuthenticationService;
 import org.sipr.core.service.SipAuthenticationService;
-import org.sipr.core.utils.SipUtils;
+import org.sipr.utils.SipUtils;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;

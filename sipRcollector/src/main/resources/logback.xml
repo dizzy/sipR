@@ -6,14 +6,19 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</pattern>
         </encoder>
     </appender>
-    <appender name="SYSLOG" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>127.0.0.1:9999</destination>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <fieldNames>
-                <version>[ignore]</version>
-                <message>message</message>
-            </fieldNames>
-        </encoder>
+    <appender name="RTCPXR" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>127.0.0.1:9998</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+          <providers>
+            <pattern>
+                <pattern>
+                    {
+                    "message": "%message"
+                    }
+                </pattern>
+            </pattern>
+        </providers>
+    </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>sipRserver.log</file>
@@ -24,7 +29,7 @@
     <logger name="org.sipr" level="INFO">
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="sipRstack" level="INFO">
-        <appender-ref ref="SYSLOG"/>
+    <logger name="vq-rtcpxr" level="INFO">
+        <appender-ref ref="RTCPXR"/>
     </logger>
 </configuration>

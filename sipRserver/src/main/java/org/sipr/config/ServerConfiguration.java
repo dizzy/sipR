@@ -3,9 +3,13 @@ package org.sipr.config;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
 import org.sipr.SipRListener;
+import org.sipr.core.config.sip.TcpListenerConfiguration;
+import org.sipr.core.config.sip.TlsListenerConfiguration;
+import org.sipr.core.config.sip.WsListenerConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 import javax.sip.SipListener;
@@ -16,6 +20,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Configuration
+@Import({ TcpListenerConfiguration.class,
+        TlsListenerConfiguration.class,
+        WsListenerConfiguration.class
+})
 public class ServerConfiguration {
     @Resource(name="tcpProviders")
     List<SipProvider> tcpProviders;
