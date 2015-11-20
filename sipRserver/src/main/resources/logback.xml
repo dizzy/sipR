@@ -17,12 +17,17 @@
     </appender>
     <appender name="RTCPXR" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>127.0.0.1:9998</destination>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <fieldNames>
-                <version>[ignore]</version>
-                <message>message</message>
-            </fieldNames>
-        </encoder>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+          <providers>
+            <pattern>
+                <pattern>
+                    {
+                    "message": "%message"
+                    }
+                </pattern>
+            </pattern>
+        </providers>
+    </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>sipRserver.log</file>

@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 
 import javax.sip.RequestEvent;
 import javax.sip.message.Request;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+
+import static org.apache.commons.lang3.StringUtils.*;
 
 @Component
 public class VqrCollectorImpl implements PublishHandler {
@@ -20,11 +24,19 @@ public class VqrCollectorImpl implements PublishHandler {
         Request publish = null;
         try {
             publish = requestEvent.getRequest();
-            String content = new String(publish.getRawContent(), "UTF-8");
-            VQR_LOGGER.info(content);
-        } catch (Exception ex) {
+            VQR_LOGGER.info(processContent(publish.getRawContent()));
+        } catch (UnsupportedEncodingException ex) {
             LOGGER.error("Failed to store event: " + publish.toString());
         }
+    }
+
+    public String processContent(byte[] rawContent) throws UnsupportedEncodingException {
+        String content = toEncodedString(rawContent, StandardCharsets.UTF_8);
+        content = content.replaceAll("\\r\\n|\\r|\\n", ",");
+        content = removeEnd(content, ",");
+        content = appendIfMissing("ReportType:", content);
+        content = remove(content, "\"");
+        return content;
     }
 
     @Override
