@@ -3,11 +3,17 @@ package org.sipr.utils;
 import gov.nist.javax.sip.address.SipUri;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
+import javax.sip.SipProvider;
 import javax.sip.address.Address;
+import javax.sip.address.AddressFactory;
+import javax.sip.address.SipURI;
 import javax.sip.address.URI;
 import javax.sip.header.*;
 import javax.sip.message.Request;
+import java.text.ParseException;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -15,6 +21,12 @@ import static org.apache.commons.collections4.IteratorUtils.toList;
 
 @Component
 public class SipUtils {
+
+    @Inject
+    AddressFactory addressFactory;
+
+    @Inject
+    HeaderFactory headerFactory;
 
     public String getCallId(RequestEvent requestEvent) {
         Request request = requestEvent.getRequest();
@@ -37,7 +49,8 @@ public class SipUtils {
     }
 
     public String extractAuthUser(Request request) {
-        if (request.getMethod().equalsIgnoreCase(Request.REGISTER)) {
+        if (request.getMethod().equalsIgnoreCase(Request.REGISTER)
+                || request.getMethod().equalsIgnoreCase(Request.SUBSCRIBE)) {
             return extractToUser(request);
         }
         return extractFromUser(request);
@@ -80,4 +93,18 @@ public class SipUtils {
         }
         return false;
     }
+
+    public String getFirstContactUri(Request request) {
+        List<ContactHeader> headers = extractContactHeaders(request);
+        return headers.get(0).getAddress().getURI().toString();
+    }
+
+    public ContactHeader createProviderContactHeader(SipProvider sipProvider) throws ParseException {
+        ListeningPoint listeningPoint = sipProvider.getListeningPoints()[0];
+        SipURI uri = addressFactory.createSipURI(null, listeningPoint.getIPAddress());
+        uri.setPort(listeningPoint.getPort());
+        Address address = addressFactory.createAddress(uri);
+        return headerFactory.createContactHeader(address);
+    }
+
 }

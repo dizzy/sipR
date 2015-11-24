@@ -43,7 +43,6 @@ public class SipRListener implements SipListener {
 
     @Override
     public void processResponse(ResponseEvent responseEvent) {
-        LOGGER.info(responseEvent.getResponse().toString());
         responseProcessor.processEvent(responseEvent);
     }
 

@@ -46,11 +46,10 @@ public class PublishRequestProcessor implements RequestProcessor {
 
             if (handler == null) {
                 sipMessageSender.sendResponse(requestEvent, Response.NOT_IMPLEMENTED);
+            } else {
+                handler.handleRequest(requestEvent);
+                sipMessageSender.sendResponse(requestEvent, Response.OK);
             }
-
-            handler.handleRequest(requestEvent);
-
-            sipMessageSender.sendResponse(requestEvent, Response.OK);
 
         } catch (RequestException ex) {
             sipMessageSender.sendResponse(requestEvent, ex.getErrorCode(), ex.getHeaders());
