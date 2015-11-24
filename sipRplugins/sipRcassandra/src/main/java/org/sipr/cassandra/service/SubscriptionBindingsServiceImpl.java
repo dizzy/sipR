@@ -2,7 +2,6 @@ package org.sipr.cassandra.service;
 
 import org.sipr.cassandra.dao.CassandraSubscriptionsRepository;
 import org.sipr.cassandra.domain.CassandraSubscriptionBinding;
-import org.sipr.core.domain.SubscriptionBinding;
 import org.sipr.core.service.SubscriptionBindingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.List;
 
 @Component
 public class SubscriptionBindingsServiceImpl implements SubscriptionBindingsService<CassandraSubscriptionBinding> {

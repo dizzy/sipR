@@ -10,13 +10,13 @@ import javax.sip.message.Request;
 import java.text.ParseException;
 
 @Component
-public class MwiNotifyBuilder implements NotifyBodyBuilder {
+public class MwiContentBuilder implements NotifyContentBuilder {
 
     @Inject
     HeaderFactory headerFactory;
 
     @Override
-    public void addMessageBody(Request notifyRequest) throws ParseException {
+    public void addContent(Request notifyRequest) throws ParseException {
         ContentImpl content = new ContentImpl("");
         // TODO implement MailboxService, get some real data
         content.addExtensionHeader(headerFactory.createHeader("Messages-Waiting", "yes"));

@@ -4,7 +4,7 @@ import org.sipr.core.domain.SubscriptionBinding;
 import org.sipr.core.service.SubscriptionBindingsService;
 import org.sipr.core.sip.request.handler.SubscriptionHandler;
 import org.sipr.core.sip.request.processor.RequestException;
-import org.sipr.request.notify.NotifyBodyBuilder;
+import org.sipr.request.notify.NotifyContentBuilder;
 import org.sipr.utils.SipUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,13 +45,13 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
     private int serverExpire;
 
     @Inject
-    List<NotifyBodyBuilder> notifyBuilders;
+    List<NotifyContentBuilder> notifyBuilders;
 
-    Map<String, NotifyBodyBuilder> notifyBuildersMap;
+    Map<String, NotifyContentBuilder> notifyBuildersMap;
 
     @PostConstruct
     void init() {
-        notifyBuildersMap = notifyBuilders.stream().collect(toMap(NotifyBodyBuilder::getEventType, (r) -> r));
+        notifyBuildersMap = notifyBuilders.stream().collect(toMap(NotifyContentBuilder::getEventType, (r) -> r));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 
         EventHeader eventHeader = (EventHeader) request.getHeader(EventHeader.NAME);
         String eventType = eventHeader.getEventType();
-        NotifyBodyBuilder notifyBuilder = notifyBuildersMap.get(eventType);
+        NotifyContentBuilder notifyBuilder = notifyBuildersMap.get(eventType);
         if (notifyBuilder == null) {
             throw new RequestException(Response.NOT_IMPLEMENTED);
         }
@@ -125,7 +125,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
             notifyRequest.addHeader(state);
 
             if (!unsubscribe) {
-                notifyBuilder.addMessageBody(notifyRequest);
+                notifyBuilder.addContent(notifyRequest);
             }
 
             ClientTransaction ct = sipProvider.getNewClientTransaction(notifyRequest);

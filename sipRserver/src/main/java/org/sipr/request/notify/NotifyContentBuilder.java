@@ -3,9 +3,9 @@ package org.sipr.request.notify;
 import javax.sip.message.Request;
 import java.text.ParseException;
 
-public interface NotifyBodyBuilder {
+public interface NotifyContentBuilder {
 
-    void addMessageBody(Request notifyRequest) throws ParseException;
+    void addContent(Request notifyRequest) throws ParseException;
 
     String getEventType();
 
