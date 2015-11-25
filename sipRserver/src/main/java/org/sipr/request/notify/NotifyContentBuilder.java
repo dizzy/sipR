@@ -5,7 +5,7 @@ import java.text.ParseException;
 
 public interface NotifyContentBuilder {
 
-    void addContent(Request notifyRequest) throws ParseException;
+    void addContent(Request notifyRequest, String user, byte[] rawContent) throws ParseException;
 
     String getEventType();
 

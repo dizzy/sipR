@@ -88,9 +88,6 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
                 response = messageFactory.createResponse(Response.OK, request);
             }
 
-            ContactHeader contactHeader = sipUtils.createProviderContactHeader(sipProvider);
-            response.addHeader(contactHeader);
-
             ExpiresHeader expires = (ExpiresHeader) request.getHeader(ExpiresHeader.NAME);
             if (expires == null) {
                 expires = headerFactory.createExpiresHeader(serverExpire);
@@ -101,10 +98,17 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 
             String contactUri = sipUtils.getFirstContactUri(request);
             SubscriptionBinding subscription = (SubscriptionBinding) subscriptionBindingsService.findByContactAndType(contactUri, eventType);
+            String callId = ((CallIdHeader) request.getHeader(CallIdHeader.NAME)).getCallId();
+            long cseq = ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
+            String user = sipUtils.extractAuthUser(request);
+
             if (subscription == null) {
-                subscription = (SubscriptionBinding) subscriptionBindingsService.createSubscription(sipUtils.extractAuthUser(request),
-                        contactUri, ((CallIdHeader) request.getHeader(CallIdHeader.NAME)).getCallId(),
-                        ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber(), expires.getExpires(), eventType);
+                subscription = (SubscriptionBinding) subscriptionBindingsService.createSubscription(user,
+                        contactUri, callId, cseq, expires.getExpires(), eventType);
+            } else {
+                subscription.setCallId(callId);
+                subscription.setCseq(cseq);
+                subscription.setExpires(expires.getExpires());
             }
 
             if (!unsubscribe) {
@@ -120,12 +124,11 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
             }
 
             Request notifyRequest = dialog.createRequest(Request.NOTIFY);
-            notifyRequest.setHeader(contactHeader);
             notifyRequest.setHeader(eventHeader);
             notifyRequest.addHeader(state);
 
             if (!unsubscribe) {
-                notifyBuilder.addContent(notifyRequest);
+                notifyBuilder.addContent(notifyRequest, user, request.getRawContent());
             }
 
             ClientTransaction ct = sipProvider.getNewClientTransaction(notifyRequest);

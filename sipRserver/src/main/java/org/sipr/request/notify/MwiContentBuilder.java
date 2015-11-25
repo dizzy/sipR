@@ -16,12 +16,12 @@ public class MwiContentBuilder implements NotifyContentBuilder {
     HeaderFactory headerFactory;
 
     @Override
-    public void addContent(Request notifyRequest) throws ParseException {
+    public void addContent(Request notifyRequest, String user, byte[] rawcontent) throws ParseException {
         ContentImpl content = new ContentImpl("");
         // TODO implement MailboxService, get some real data
         content.addExtensionHeader(headerFactory.createHeader("Messages-Waiting", "yes"));
         content.addExtensionHeader(headerFactory.createHeader("Message-Account", "200@sipr.org"));
-        content.addExtensionHeader(headerFactory.createHeader("Voice-Message", "11/12 (0/0)"));
+        content.addExtensionHeader(headerFactory.createHeader("Voice-Message", "8/11 (0/0)"));
 
         ContentTypeHeader contentTypeHeader = headerFactory.createContentTypeHeader("application", "simple-message-summary");
         notifyRequest.setContent(content, contentTypeHeader);

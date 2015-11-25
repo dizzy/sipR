@@ -58,11 +58,9 @@ public class SipRListener implements SipListener {
 
     @Override
     public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {
-        LOGGER.info(transactionTerminatedEvent.toString());
     }
 
     @Override
     public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
-        LOGGER.info(dialogTerminatedEvent.toString());
     }
 }
