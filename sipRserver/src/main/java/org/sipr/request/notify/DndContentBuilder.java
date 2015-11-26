@@ -36,9 +36,9 @@ public class DndContentBuilder implements NotifyContentBuilder {
     public void addContent(Request notifyRequest, String user, byte[] rawContent) throws ParseException {
         String content = new String(rawContent, StandardCharsets.UTF_8);
 
-        UserPresence presence = (UserPresence) presenceService.getPresence(user);
+        UserPresence presence = presenceService.getPresence(user);
         if (presence == null) {
-            presence = (UserPresence) presenceService.createPresence(user, UserPresence.AVAILABLE);
+            presence = presenceService.createPresence(user, UserPresence.AVAILABLE);
             presenceService.savePresence(presence);
         }
 

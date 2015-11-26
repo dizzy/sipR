@@ -5,10 +5,8 @@ import org.sipr.core.service.SubscriptionBindingsService;
 import org.sipr.core.sip.request.handler.SubscriptionHandler;
 import org.sipr.core.sip.request.processor.RequestException;
 import org.sipr.request.notify.NotifyContentBuilder;
-import org.sipr.utils.SipUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -36,13 +34,10 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
     HeaderFactory headerFactory;
 
     @Inject
-    SipUtils sipUtils;
+    SubscriptionRequestBuilder requestBuilder;
 
     @Inject
     SubscriptionBindingsService subscriptionBindingsService;
-
-    @Value("${sip.registration.expires}")
-    private int serverExpire;
 
     @Inject
     List<NotifyContentBuilder> notifyBuilders;
@@ -56,85 +51,85 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 
     @Override
     public void handleRequest(RequestEvent requestEvent) throws RequestException {
-        SipProvider sipProvider = (SipProvider) requestEvent.getSource();
-        Request request = requestEvent.getRequest();
-
-        EventHeader eventHeader = (EventHeader) request.getHeader(EventHeader.NAME);
-        String eventType = eventHeader.getEventType();
-        NotifyContentBuilder notifyBuilder = notifyBuildersMap.get(eventType);
-        if (notifyBuilder == null) {
-            throw new RequestException(Response.NOT_IMPLEMENTED);
-        }
-
-        Response response = null;
 
         try {
-            ServerTransaction st = requestEvent.getServerTransaction();
-            if (st == null) {
-                st = sipProvider.getNewServerTransaction(request);
-            }
 
-            Dialog dialog = requestEvent.getDialog();
-            if (dialog == null) {
-                String toTag = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
-                response = messageFactory.createResponse(Response.ACCEPTED, request);
+            SubscriptionRequest request = requestBuilder.getSubscriptionRequest(requestEvent);
 
-                ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
-                toHeader.setTag(toTag);
+            NotifyContentBuilder notifyBuilder = getNotifier(request);
 
-                dialog = st.getDialog();
-                dialog.terminateOnBye(false);
-            } else {
-                response = messageFactory.createResponse(Response.OK, request);
-            }
-
-            ExpiresHeader expires = (ExpiresHeader) request.getHeader(ExpiresHeader.NAME);
-            if (expires == null) {
-                expires = headerFactory.createExpiresHeader(serverExpire);
-            }
-            response.addHeader(expires);
-
-            boolean unsubscribe = expires.getExpires() == 0;
-
-            String contactUri = sipUtils.getFirstContactUri(request);
-            SubscriptionBinding subscription = subscriptionBindingsService.findByContactAndType(contactUri, eventType);
-            String callId = ((CallIdHeader) request.getHeader(CallIdHeader.NAME)).getCallId();
-            long cseq = ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
-            String user = sipUtils.extractAuthUser(request);
-
-            if (subscription == null) {
-                subscription = subscriptionBindingsService.createSubscription(user, contactUri, callId, cseq, expires.getExpires(), eventType);
-            } else {
-                subscription.setCallId(callId);
-                subscription.setCseq(cseq);
-                subscription.setExpires(expires.getExpires());
-            }
-
-            if (!unsubscribe) {
+            // update subscription in database
+            SubscriptionBinding subscription = getSubscriptionBinding(request);
+            if (!request.isUnsubscribe()) {
                 subscriptionBindingsService.saveSubscription(subscription);
-            }
-            st.sendResponse(response);
-
-            SubscriptionStateHeader state = headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.ACTIVE);
-            if (unsubscribe) {
+            } else {
                 subscriptionBindingsService.deleteSubscription(subscription);
-                state = headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.TERMINATED);
-                state.setReasonCode("deactivated");
             }
 
+            // create and send subscription response
+            Response response = createSubscriptionResponse(request);
+            ServerTransaction serverTransaction = request.getServerTransaction();
+            serverTransaction.sendResponse(response);
+
+            // create NOTIFY request
+            Dialog dialog = request.getDialog();
             Request notifyRequest = dialog.createRequest(Request.NOTIFY);
-            notifyRequest.setHeader(eventHeader);
-            notifyRequest.addHeader(state);
+            addNotifyRequestHeaders(notifyRequest, request);
 
-            if (!unsubscribe) {
-                notifyBuilder.addContent(notifyRequest, user, request.getRawContent());
+            // delegate to build NOTIFY content
+            if (!request.isUnsubscribe()) {
+                notifyBuilder.addContent(notifyRequest, request.getUser(), request.getRequest().getRawContent());
             }
 
-            ClientTransaction ct = sipProvider.getNewClientTransaction(notifyRequest);
+            // send NOTIFY request
+            ClientTransaction ct = request.getSipProvider().getNewClientTransaction(notifyRequest);
             dialog.sendRequest(ct);
 
         } catch (InvalidArgumentException | ParseException | SipException ex) {
             throw new RequestException(Response.SERVER_INTERNAL_ERROR);
         }
+    }
+
+    NotifyContentBuilder getNotifier(SubscriptionRequest request) throws RequestException {
+        NotifyContentBuilder notifyBuilder = notifyBuildersMap.get(request.getEventType());
+        if (notifyBuilder == null) {
+            throw new RequestException(Response.NOT_IMPLEMENTED);
+        }
+        return notifyBuilder;
+    }
+
+    SubscriptionBinding getSubscriptionBinding(SubscriptionRequest request) {
+        SubscriptionBinding subscription = subscriptionBindingsService.findByContactAndType(request.getContactUri(), request.getEventType());
+        if (subscription == null) {
+            subscription = subscriptionBindingsService.createSubscription(request.getUser(), request.getContactUri(), request.getCallId(),
+                    request.getCSeq(), request.getExpires(), request.getEventType());
+        } else {
+            subscription.setCallId(request.getCallId());
+            subscription.setCseq(request.getCSeq());
+            subscription.setExpires(request.getExpires());
+        }
+        return subscription;
+    }
+
+    Response createSubscriptionResponse(SubscriptionRequest request) throws ParseException {
+        Response response = messageFactory.createResponse(request.getResponse(), request.getRequest());
+        if (request.isInitialSubscribe()) {
+            String toTag = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
+            ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+            toHeader.setTag(toTag);
+        }
+        response.addHeader(request.getExpiresHeader());
+        return response;
+    }
+
+    void addNotifyRequestHeaders(Request notifyRequest, SubscriptionRequest request) throws ParseException, SipException {
+        SubscriptionStateHeader state = headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.ACTIVE);
+        if (request.isUnsubscribe()) {
+            state = headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.TERMINATED);
+            state.setReasonCode("deactivated");
+        }
+
+        notifyRequest.setHeader(request.getEventHeader());
+        notifyRequest.addHeader(state);
     }
 }
