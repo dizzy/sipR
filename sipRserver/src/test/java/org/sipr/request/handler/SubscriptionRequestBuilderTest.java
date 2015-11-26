@@ -140,8 +140,8 @@ public class SubscriptionRequestBuilderTest {
         assertEquals(newExpiresHeader, sRequest.getExpiresHeader());
     }
 
-    private SubscriptionRequestBuilder getBuilder() {
-        SubscriptionRequestBuilder builder = new SubscriptionRequestBuilder();
+    private SubscriptionRequestBuilderImpl getBuilder() {
+        SubscriptionRequestBuilderImpl builder = new SubscriptionRequestBuilderImpl();
         builder.sipUtils = sipUtils;
         builder.serverExpire = 22;
         return builder;

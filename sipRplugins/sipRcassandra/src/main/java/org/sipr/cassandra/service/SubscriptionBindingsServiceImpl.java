@@ -12,6 +12,7 @@ import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.util.List;
 
 @Component
 public class SubscriptionBindingsServiceImpl implements SubscriptionBindingsService {
@@ -40,6 +41,11 @@ public class SubscriptionBindingsServiceImpl implements SubscriptionBindingsServ
         WriteOptions options = new WriteOptions();
         options.setTtl(subscription.getExpires() + 5);
         cassandraTemplate.insert(subscription, options);
+    }
+
+    @Override
+    public List<SubscriptionBinding> findByUserNameAndType(String userName, String type) {
+        return (List<SubscriptionBinding>)(List<?>) subscriptionsRepository.findByUsernameAndType(userName, type);
     }
 
     @Override

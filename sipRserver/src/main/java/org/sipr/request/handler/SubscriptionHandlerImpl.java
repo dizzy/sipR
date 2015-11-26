@@ -59,12 +59,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
             NotifyContentBuilder notifyBuilder = getNotifier(request);
 
             // update subscription in database
-            SubscriptionBinding subscription = getSubscriptionBinding(request);
-            if (!request.isUnsubscribe()) {
-                subscriptionBindingsService.saveSubscription(subscription);
-            } else {
-                subscriptionBindingsService.deleteSubscription(subscription);
-            }
+            updateSubscriptionStorage(request);
 
             // create and send subscription response
             Response response = createSubscriptionResponse(request);
@@ -78,7 +73,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 
             // delegate to build NOTIFY content
             if (!request.isUnsubscribe()) {
-                notifyBuilder.addContent(notifyRequest, request.getUser(), request.getRequest().getRawContent());
+                notifyBuilder.addContent(notifyRequest, request);
             }
 
             // send NOTIFY request
@@ -98,7 +93,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
         return notifyBuilder;
     }
 
-    SubscriptionBinding getSubscriptionBinding(SubscriptionRequest request) {
+    void updateSubscriptionStorage(SubscriptionRequest request) {
         SubscriptionBinding subscription = subscriptionBindingsService.findByContactAndType(request.getContactUri(), request.getEventType());
         if (subscription == null) {
             subscription = subscriptionBindingsService.createSubscription(request.getUser(), request.getContactUri(), request.getCallId(),
@@ -108,7 +103,12 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
             subscription.setCseq(request.getCSeq());
             subscription.setExpires(request.getExpires());
         }
-        return subscription;
+
+        if (!request.isUnsubscribe()) {
+            subscriptionBindingsService.saveSubscription(subscription);
+        } else {
+            subscriptionBindingsService.deleteSubscription(subscription);
+        }
     }
 
     Response createSubscriptionResponse(SubscriptionRequest request) throws ParseException {

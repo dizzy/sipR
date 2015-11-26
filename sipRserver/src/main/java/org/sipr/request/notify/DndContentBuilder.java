@@ -2,6 +2,9 @@ package org.sipr.request.notify;
 
 import org.sipr.core.domain.UserPresence;
 import org.sipr.core.service.UserPresenceService;
+import org.sipr.request.handler.SubscriptionRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -18,9 +21,11 @@ import static org.apache.commons.lang3.StringUtils.*;
 @Component
 public class DndContentBuilder implements NotifyContentBuilder {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DndContentBuilder.class);
+
     private static final Pattern DND_PATTERN = Pattern.compile("<doNotDisturbOn>(.+?)</doNotDisturbOn>");
 
-    private static final String DND_EVENT = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n" +
+    public static final String DND_EVENT = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n" +
             "<DoNotDisturbEvent xmlns=\"http://www.ecma-international.org/standards/ecma-323/csta/ed3\">\r\n" +
             "  <device>%s</device>\r\n" +
             "  <doNotDisturbOn>%s</doNotDisturbOn>\r\n" +
@@ -32,16 +37,16 @@ public class DndContentBuilder implements NotifyContentBuilder {
     @Inject
     UserPresenceService presenceService;
 
+    @Inject
+    NotifySender sender;
+
     @Override
-    public void addContent(Request notifyRequest, String user, byte[] rawContent) throws ParseException {
-        String content = new String(rawContent, StandardCharsets.UTF_8);
+    public void addContent(Request notifyRequest, SubscriptionRequest request) throws ParseException {
+        String content = new String(request.getRequest().getRawContent(), StandardCharsets.UTF_8);
+        String user = request.getUser();
 
         UserPresence presence = presenceService.getPresence(user);
-        if (presence == null) {
-            presence = presenceService.createPresence(user, UserPresence.AVAILABLE);
-            presenceService.savePresence(presence);
-        }
-
+        boolean sendToAll = false;
         boolean dnd = false;
         if (isNotEmpty(content)) {
             Matcher matcher = DND_PATTERN.matcher(content);
@@ -56,12 +61,20 @@ public class DndContentBuilder implements NotifyContentBuilder {
             }
             presenceService.savePresence(presence);
 
+            sendToAll = true;
+
         } else {
             dnd = presence.isDndEnabled();
         }
 
+        String responseContent = String.format(DND_EVENT, user, dnd);
         ContentTypeHeader contentTypeHeader = headerFactory.createContentTypeHeader("application", "x-as-feature-event+xml");
-        notifyRequest.setContent(String.format(DND_EVENT, user, dnd), contentTypeHeader);
+        notifyRequest.setContent(responseContent, contentTypeHeader);
+
+        //trigger notifies for all contacts but this one
+        if (sendToAll) {
+            sender.sendNotifyToAllSubscribers(request, contentTypeHeader, responseContent);
+        }
     }
 
     @Override

@@ -16,7 +16,11 @@ public class UserPresenceServiceImpl implements UserPresenceService {
 
     @Override
     public UserPresence getPresence(String user) {
-        return repository.findByUserName(user);
+        UserPresence presence = repository.findByUserName(user);
+        if (presence == null) {
+            presence = repository.save(new CassandraUserPresence(user, UserPresence.AVAILABLE));
+        }
+        return presence;
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.Resource;
 import javax.sip.SipListener;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Configuration
+@EnableAsync
 @Import({ TcpListenerConfiguration.class,
         TlsListenerConfiguration.class,
         WsListenerConfiguration.class

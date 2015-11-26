@@ -20,6 +20,14 @@ public class SubscriptionRequest {
     boolean isUnsubscribe;
     int response = Response.OK;
 
+    public SubscriptionRequest() {
+    }
+
+    public SubscriptionRequest(RequestEvent requestEvent, String authUser) {
+        this.requestEvent = requestEvent;
+        this.authUser = authUser;
+    }
+
     public String getEventType() {
         return eventHeader.getEventType();
     }

@@ -1,6 +1,7 @@
 package org.sipr.request.notify;
 
 import gov.nist.javax.sip.message.ContentImpl;
+import org.sipr.request.handler.SubscriptionRequest;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -16,11 +17,12 @@ public class MwiContentBuilder implements NotifyContentBuilder {
     HeaderFactory headerFactory;
 
     @Override
-    public void addContent(Request notifyRequest, String user, byte[] rawcontent) throws ParseException {
+    public void addContent(Request notifyRequest, SubscriptionRequest request) throws ParseException {
         ContentImpl content = new ContentImpl("");
+
         // TODO implement MailboxService, get some real data
         content.addExtensionHeader(headerFactory.createHeader("Messages-Waiting", "yes"));
-        content.addExtensionHeader(headerFactory.createHeader("Message-Account", "200@sipr.org"));
+        content.addExtensionHeader(headerFactory.createHeader("Message-Account", request.getUser()));
         content.addExtensionHeader(headerFactory.createHeader("Voice-Message", "8/11 (0/0)"));
 
         ContentTypeHeader contentTypeHeader = headerFactory.createContentTypeHeader("application", "simple-message-summary");
