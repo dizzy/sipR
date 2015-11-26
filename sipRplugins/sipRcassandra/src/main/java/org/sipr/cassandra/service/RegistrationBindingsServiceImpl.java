@@ -2,6 +2,7 @@ package org.sipr.cassandra.service;
 
 import org.sipr.cassandra.dao.CassandraRegistrationsRepository;
 import org.sipr.cassandra.domain.CassandraRegistrationBinding;
+import org.sipr.core.domain.RegistrationBinding;
 import org.sipr.core.service.RegistrationBindingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ import java.util.Map;
 import static java.lang.String.format;
 
 @Component
-public class RegistrationBindingsServiceImpl implements RegistrationBindingsService<CassandraRegistrationBinding> {
+public class RegistrationBindingsServiceImpl implements RegistrationBindingsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationBindingsServiceImpl.class);
 
     @Inject
@@ -35,19 +36,19 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public void deleteBindings(List<CassandraRegistrationBinding> bindings) {
+    public void deleteBindings(List bindings) {
         registrationsRepository.delete(bindings);
     }
 
     @Override
-    public void saveBindings(List<CassandraRegistrationBinding> bindings) {
-        for (CassandraRegistrationBinding binding : bindings) {
+    public void saveBindings(List<RegistrationBinding> bindings) {
+        for (RegistrationBinding binding : bindings) {
             saveBinding(binding);
         }
     }
 
     @Override
-    public Map<String, CassandraRegistrationBinding> findByUserName(String userName) {
+    public Map<String, RegistrationBinding> findByUserName(String userName) {
         List<CassandraRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
         Map registrations = new HashMap<>();
         for (CassandraRegistrationBinding binding : bindings) {
@@ -57,12 +58,12 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public void deleteBinding(CassandraRegistrationBinding binding) {
-        registrationsRepository.delete(Collections.singletonList(binding));
+    public void deleteBinding(RegistrationBinding binding) {
+        registrationsRepository.delete((CassandraRegistrationBinding) binding);
     }
 
     @Override
-    public void saveBinding(CassandraRegistrationBinding binding) {
+    public void saveBinding(RegistrationBinding binding) {
         // TODO use TTL repository support when available
         // workaround lack of TTL support in spring data repository, use template to insert with TTL
         WriteOptions options = new WriteOptions();
@@ -71,7 +72,7 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public CassandraRegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
+    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
         return new CassandraRegistrationBinding(user, contactUri, callId, cseq, expires);
     }
 }

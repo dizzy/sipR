@@ -1,5 +1,6 @@
 package org.sipr.couchdb.service;
 
+import org.sipr.core.domain.RegistrationBinding;
 import org.sipr.core.service.RegistrationBindingsService;
 import org.sipr.couchdb.dao.CouchDBRegistrationsRepository;
 import org.sipr.couchdb.domain.CouchDBRegistrationBinding;
@@ -13,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toMap;
 
 @Component
-public class RegistrationBindingsServiceImpl implements RegistrationBindingsService<CouchDBRegistrationBinding> {
+public class RegistrationBindingsServiceImpl implements RegistrationBindingsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationBindingsServiceImpl.class);
 
     @Inject
@@ -29,17 +29,17 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public void deleteBindings(List<CouchDBRegistrationBinding> couchDBRegistrationBindings) {
+    public void deleteBindings(List couchDBRegistrationBindings) {
         registrationsRepository.deleteBindings(couchDBRegistrationBindings);
     }
 
     @Override
-    public void saveBindings(List<CouchDBRegistrationBinding> couchDBRegistrationBindings) {
+    public void saveBindings(List couchDBRegistrationBindings) {
         registrationsRepository.saveBindings(couchDBRegistrationBindings);
     }
 
     @Override
-    public Map<String, CouchDBRegistrationBinding> findByUserName(String userName) {
+    public Map<String, RegistrationBinding> findByUserName(String userName) {
         List<CouchDBRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
         Map registrations = new HashMap<>();
         for (CouchDBRegistrationBinding binding : bindings) {
@@ -49,17 +49,17 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public void deleteBinding(CouchDBRegistrationBinding couchDBRegistrationBinding) {
-        registrationsRepository.deleteBinding(couchDBRegistrationBinding);
+    public void deleteBinding(RegistrationBinding couchDBRegistrationBinding) {
+        registrationsRepository.deleteBinding((CouchDBRegistrationBinding) couchDBRegistrationBinding);
     }
 
     @Override
-    public void saveBinding(CouchDBRegistrationBinding couchDBRegistrationBinding) {
-        registrationsRepository.saveBinding(couchDBRegistrationBinding);
+    public void saveBinding(RegistrationBinding couchDBRegistrationBinding) {
+        registrationsRepository.saveBinding((CouchDBRegistrationBinding) couchDBRegistrationBinding);
     }
 
     @Override
-    public CouchDBRegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
+    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
         CouchDBRegistrationBinding regBinding = new CouchDBRegistrationBinding(user, contactUri, callId, cseq, expires);
         saveBinding(regBinding);
         return regBinding;

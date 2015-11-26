@@ -97,14 +97,13 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
             boolean unsubscribe = expires.getExpires() == 0;
 
             String contactUri = sipUtils.getFirstContactUri(request);
-            SubscriptionBinding subscription = (SubscriptionBinding) subscriptionBindingsService.findByContactAndType(contactUri, eventType);
+            SubscriptionBinding subscription = subscriptionBindingsService.findByContactAndType(contactUri, eventType);
             String callId = ((CallIdHeader) request.getHeader(CallIdHeader.NAME)).getCallId();
             long cseq = ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
             String user = sipUtils.extractAuthUser(request);
 
             if (subscription == null) {
-                subscription = (SubscriptionBinding) subscriptionBindingsService.createSubscription(user,
-                        contactUri, callId, cseq, expires.getExpires(), eventType);
+                subscription = subscriptionBindingsService.createSubscription(user, contactUri, callId, cseq, expires.getExpires(), eventType);
             } else {
                 subscription.setCallId(callId);
                 subscription.setCseq(cseq);

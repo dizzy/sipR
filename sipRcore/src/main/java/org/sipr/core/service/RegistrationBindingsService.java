@@ -1,12 +1,14 @@
 package org.sipr.core.service;
 
+import org.sipr.core.domain.RegistrationBinding;
+
 import java.util.List;
 import java.util.Map;
 
-public interface RegistrationBindingsService<RegistrationBinding> {
+public interface RegistrationBindingsService {
     void deleteAllBindings(String userName);
 
-    void deleteBindings(List<RegistrationBinding> bindings);
+    void deleteBindings(List<?> bindings);
 
     void saveBindings(List<RegistrationBinding> bindings);
 
@@ -16,5 +18,5 @@ public interface RegistrationBindingsService<RegistrationBinding> {
 
     void saveBinding(RegistrationBinding binding);
 
-    RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires);
+    <T extends RegistrationBinding> T createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires);
 }

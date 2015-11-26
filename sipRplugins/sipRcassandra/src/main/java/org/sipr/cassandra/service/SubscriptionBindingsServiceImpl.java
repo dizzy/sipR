@@ -2,6 +2,7 @@ package org.sipr.cassandra.service;
 
 import org.sipr.cassandra.dao.CassandraSubscriptionsRepository;
 import org.sipr.cassandra.domain.CassandraSubscriptionBinding;
+import org.sipr.core.domain.SubscriptionBinding;
 import org.sipr.core.service.SubscriptionBindingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 
 @Component
-public class SubscriptionBindingsServiceImpl implements SubscriptionBindingsService<CassandraSubscriptionBinding> {
+public class SubscriptionBindingsServiceImpl implements SubscriptionBindingsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubscriptionBindingsServiceImpl.class);
 
     @Inject
@@ -28,12 +29,12 @@ public class SubscriptionBindingsServiceImpl implements SubscriptionBindingsServ
     }
 
     @Override
-    public void deleteSubscription(CassandraSubscriptionBinding subscription) {
-        subscriptionsRepository.delete(subscription);
+    public void deleteSubscription(SubscriptionBinding subscription) {
+        subscriptionsRepository.delete((CassandraSubscriptionBinding) subscription);
     }
 
     @Override
-    public void saveSubscription(CassandraSubscriptionBinding subscription) {
+    public void saveSubscription(SubscriptionBinding subscription) {
         // TODO use TTL repository support when available
         // workaround lack of TTL support in spring data repository, use template to insert with TTL
         WriteOptions options = new WriteOptions();

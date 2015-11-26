@@ -1,24 +1,22 @@
 package org.sipr.jpa.service;
 
+import org.sipr.core.domain.RegistrationBinding;
 import org.sipr.core.service.RegistrationBindingsService;
 import org.sipr.jpa.dao.JpaRegistrationsRepository;
 import org.sipr.jpa.domain.JpaRegistrationBinding;
-import org.sipr.jpa.domain.JpaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toMap;
 
 @Component
-public class RegistrationBindingsServiceImpl implements RegistrationBindingsService<JpaRegistrationBinding> {
+public class RegistrationBindingsServiceImpl implements RegistrationBindingsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationBindingsServiceImpl.class);
 
     @Inject
@@ -31,17 +29,17 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public void deleteBindings(List<JpaRegistrationBinding> bindings) {
+    public void deleteBindings(List bindings) {
         registrationsRepository.delete(bindings);
     }
 
     @Override
-    public void saveBindings(List<JpaRegistrationBinding> bindings) {
+    public void saveBindings(List bindings) {
         registrationsRepository.save(bindings);
     }
 
     @Override
-    public Map<String, JpaRegistrationBinding> findByUserName(String userName) {
+    public Map<String, RegistrationBinding> findByUserName(String userName) {
         List<JpaRegistrationBinding> bindings = registrationsRepository.findByUserName(userName);
         Map registrations = new HashMap<>();
         for (JpaRegistrationBinding binding : bindings) {
@@ -51,17 +49,17 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public void deleteBinding(JpaRegistrationBinding binding) {
-        registrationsRepository.delete(Collections.singletonList(binding));
+    public void deleteBinding(RegistrationBinding binding) {
+        registrationsRepository.delete((JpaRegistrationBinding) binding);
     }
 
     @Override
-    public void saveBinding(JpaRegistrationBinding binding) {
-        registrationsRepository.save(binding);
+    public void saveBinding(RegistrationBinding binding) {
+        registrationsRepository.save((JpaRegistrationBinding) binding);
     }
 
     @Override
-    public JpaRegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
+    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
         return new JpaRegistrationBinding(user, contactUri, callId, cseq, expires);
     }
 }

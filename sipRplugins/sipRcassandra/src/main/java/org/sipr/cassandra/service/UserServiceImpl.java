@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 
 @Component
-public class UserServiceImpl implements UserService<CassandraUser> {
+public class UserServiceImpl implements UserService {
 
     @Inject
     CassandraUserRepository usersRepository;
 
     @Override
     public CassandraUser getUser(String userName) throws UserNotFoundException {
-        CassandraUser user = (CassandraUser) usersRepository.findByUserName(userName);
+        CassandraUser user = usersRepository.findByUserName(userName);
         if (user == null) {
             throw new UserNotFoundException();
         }

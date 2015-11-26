@@ -1,6 +1,8 @@
 package org.sipr.core.service;
 
-public interface UserPresenceService<UserPresence> {
+import org.sipr.core.domain.UserPresence;
+
+public interface UserPresenceService {
 
     UserPresence getPresence(String user);
 

@@ -1,5 +1,7 @@
 package org.sipr.core.service;
 
-public interface UserService<User> {
+import org.sipr.core.domain.User;
+
+public interface UserService {
     User getUser(String userName) throws UserNotFoundException;
 }

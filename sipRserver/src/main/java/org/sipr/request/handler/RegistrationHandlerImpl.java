@@ -82,7 +82,7 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
                     if (expires == -1) {
                         expires = serverExpire;
                     }
-                    RegistrationBinding newBinding = (RegistrationBinding) registrationService.createRegistrationBinding(user, contactUri, callId, cseq, expires);
+                    RegistrationBinding newBinding = registrationService.createRegistrationBinding(user, contactUri, callId, cseq, expires);
                     bindingsToSave.add(newBinding);
                     currentBindings.put(newBinding.getContact(), newBinding);
                 }
