@@ -58,18 +58,18 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 
             NotifyContentBuilder notifyBuilder = getNotifier(request);
 
-            // update subscription in database
-            updateSubscriptionStorage(request);
-
             // create and send subscription response
             Response response = createSubscriptionResponse(request);
             ServerTransaction serverTransaction = request.getServerTransaction();
             serverTransaction.sendResponse(response);
 
+            // update subscription in database
+            SubscriptionBinding binding = updateSubscriptionStorage(request);
+
             // create NOTIFY request
             Dialog dialog = request.getDialog();
             Request notifyRequest = dialog.createRequest(Request.NOTIFY);
-            addNotifyRequestHeaders(notifyRequest, request);
+            addNotifyRequestHeaders(notifyRequest, request, binding);
 
             // delegate to build NOTIFY content
             if (!request.isUnsubscribe()) {
@@ -93,15 +93,15 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
         return notifyBuilder;
     }
 
-    void updateSubscriptionStorage(SubscriptionRequest request) {
+    SubscriptionBinding updateSubscriptionStorage(SubscriptionRequest request) {
         SubscriptionBinding subscription = subscriptionBindingsService.findByContactAndType(request.getContactUri(), request.getEventType());
         if (subscription == null) {
             subscription = subscriptionBindingsService.createSubscription(request.getUser(), request.getContactUri(), request.getCallId(),
-                    request.getCSeq(), request.getExpires(), request.getEventType());
+                    1, request.getExpires(), request.getEventType());
         } else {
             subscription.setCallId(request.getCallId());
-            subscription.setCseq(request.getCSeq());
             subscription.setExpires(request.getExpires());
+            subscription.setCseq(subscription.getCseq() + 1);
         }
 
         if (!request.isUnsubscribe()) {
@@ -109,6 +109,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
         } else {
             subscriptionBindingsService.deleteSubscription(subscription);
         }
+        return subscription;
     }
 
     Response createSubscriptionResponse(SubscriptionRequest request) throws ParseException {
@@ -122,7 +123,7 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
         return response;
     }
 
-    void addNotifyRequestHeaders(Request notifyRequest, SubscriptionRequest request) throws ParseException, SipException {
+    void addNotifyRequestHeaders(Request notifyRequest, SubscriptionRequest request, SubscriptionBinding binding) throws ParseException, SipException, InvalidArgumentException {
         SubscriptionStateHeader state = headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.ACTIVE);
         if (request.isUnsubscribe()) {
             state = headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.TERMINATED);
@@ -131,5 +132,6 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
 
         notifyRequest.setHeader(request.getEventHeader());
         notifyRequest.addHeader(state);
+        notifyRequest.setHeader(headerFactory.createCSeqHeader(Long.valueOf(binding.getCseq()), Request.NOTIFY));
     }
 }

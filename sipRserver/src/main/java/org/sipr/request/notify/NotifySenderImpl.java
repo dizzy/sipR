@@ -45,7 +45,6 @@ public class NotifySenderImpl implements NotifySender {
             ListeningPoint listeningPoint = getListeningPoint(request);
             FromHeader fromHeader = createFromHeader(listeningPoint);
             ViaHeader viaHeader = createViaHeader(listeningPoint);
-            CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(new Long(1), Request.NOTIFY);
             MaxForwardsHeader maxForwardsHeader = headerFactory.createMaxForwardsHeader(70);
             SubscriptionStateHeader stateHeader = headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.ACTIVE);
 
@@ -53,8 +52,11 @@ public class NotifySenderImpl implements NotifySender {
             List<SubscriptionBinding> bindings = subscriptionService.findByUserNameAndType(request.getUser(), request.getEventType());
             for (SubscriptionBinding binding : bindings) {
                 if (!binding.getContact().equals(request.getContactUri())) {
+                    binding.setCseq(binding.getCseq() + 1);
+                    CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(Long.valueOf(binding.getCseq()), Request.NOTIFY);
                     sendNotifyToSubscription(request, binding, cSeqHeader, viaHeader, fromHeader, maxForwardsHeader,
                             contentTypeHeader, stateHeader, content);
+                    subscriptionService.saveSubscription(binding);
                 }
             }
         } catch (ParseException | InvalidArgumentException pex) {

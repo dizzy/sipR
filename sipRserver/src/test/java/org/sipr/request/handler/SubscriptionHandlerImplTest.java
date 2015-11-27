@@ -90,6 +90,9 @@ public class SubscriptionHandlerImplTest {
     @Mock
     ClientTransaction transaction;
 
+    @Mock
+    CSeqHeader cSeqHeader;
+
     SubscriptionRequest wrapper = new SubscriptionRequest();
 
     List<NotifyContentBuilder> notifyBuilders = new ArrayList<>();
@@ -136,11 +139,14 @@ public class SubscriptionHandlerImplTest {
         when(response.getHeader(ToHeader.NAME)).thenReturn(toHeader);
         when(headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.ACTIVE)).thenReturn(active);
         when(headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.TERMINATED)).thenReturn(terminated);
+        when(headerFactory.createCSeqHeader(Long.valueOf(55), Request.NOTIFY)).thenReturn(cSeqHeader);
+        when(bindingsService.findByContactAndType("sip:dizzy;transport=tcp", "as-feature-event")).thenReturn(binding);
 
         wrapper.response = 202;
         handler.headerFactory = headerFactory;
         handler.messageFactory = messageFactory;
         handler.requestBuilder = subscriptionRequestBuilder;
+        handler.subscriptionBindingsService = bindingsService;
         handler.handleRequest(requestEvent);
         verify(dialog).sendRequest(transaction);
 
@@ -177,31 +183,32 @@ public class SubscriptionHandlerImplTest {
     @Test
     public void testUnsubscribe() throws Exception {
         when(bindingsService.findByContactAndType("sip:dizzy;transport=tcp", "as-feature-event")).thenReturn(binding);
+        when(binding.getCseq()).thenReturn(new Long(55));
         wrapper.isUnsubscribe = true;
         handler.updateSubscriptionStorage(wrapper);
 
         verify(binding).setCallId("call-id-dizzy");
         verify(binding).setExpires(5);
-        verify(binding).setCseq(55);
         verify(bindingsService).deleteSubscription(binding);
     }
 
     @Test
     public void testRefreshBinding() throws Exception {
         when(bindingsService.findByContactAndType("sip:dizzy;transport=tcp", "as-feature-event")).thenReturn(binding);
+        when(binding.getCseq()).thenReturn(new Long(55));
         wrapper.isUnsubscribe = false;
         handler.updateSubscriptionStorage(wrapper);
 
         verify(binding).setCallId("call-id-dizzy");
         verify(binding).setExpires(5);
-        verify(binding).setCseq(55);
+        verify(binding).setCseq(56);
         verify(bindingsService).saveSubscription(binding);
     }
 
     @Test
     public void testInitialSubscribe() throws Exception {
         when(bindingsService.findByContactAndType("sip:dizzy;transport=tcp", "as-feature-event")).thenReturn(null);
-        when(bindingsService.createSubscription("dizzy", "sip:dizzy;transport=tcp", "call-id-dizzy", 55, 5, "as-feature-event")).thenReturn(newBinding);
+        when(bindingsService.createSubscription("dizzy", "sip:dizzy;transport=tcp", "call-id-dizzy", 1, 5, "as-feature-event")).thenReturn(newBinding);
 
         wrapper.isUnsubscribe = false;
         handler.updateSubscriptionStorage(wrapper);
@@ -234,10 +241,11 @@ public class SubscriptionHandlerImplTest {
     void testAddHeaders(boolean finished) throws Exception {
         when(headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.ACTIVE)).thenReturn(active);
         when(headerFactory.createSubscriptionStateHeader(SubscriptionStateHeader.TERMINATED)).thenReturn(terminated);
+        when(headerFactory.createCSeqHeader(Long.valueOf(55), Request.NOTIFY)).thenReturn(cSeqHeader);
 
         handler.headerFactory = headerFactory;
         wrapper.isUnsubscribe = finished;
-        handler.addNotifyRequestHeaders(notifyRequest, wrapper);
+        handler.addNotifyRequestHeaders(notifyRequest, wrapper, binding);
         verify(notifyRequest).setHeader(eventHeader);
     }
 }

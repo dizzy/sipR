@@ -59,7 +59,7 @@ public class DigestAuthenticationService implements AuthenticationService {
             return false;
         }
 
-        if (!StringUtils.equals(details.getUsername(), user)) {
+        if (!StringUtils.equals(StringUtils.substringBefore(details.getUsername(), "/"), user)) {
             return false;
         }
 
