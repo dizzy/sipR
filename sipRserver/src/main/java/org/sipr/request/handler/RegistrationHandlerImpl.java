@@ -26,7 +26,7 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationHandlerImpl.class);
 
     @Value("${sip.registration.expires}")
-    private int serverExpire;
+    int serverExpire;
 
     @Inject
     RegistrationBindingsService registrationService;
@@ -90,6 +90,7 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
         }
 
         if (deleteAllBindings) {
+            currentBindings.clear();
             registrationService.deleteAllBindings(user);
         } else {
             if (!bindingsToDelete.isEmpty()) {
