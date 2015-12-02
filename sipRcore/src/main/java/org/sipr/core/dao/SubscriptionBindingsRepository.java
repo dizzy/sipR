@@ -5,5 +5,5 @@ import java.util.List;
 public interface SubscriptionBindingsRepository<SubscriptionBinding> {
     SubscriptionBinding findByContactAndType(String contact, String type);
 
-    List<SubscriptionBinding> findByUsernameAndType(String user, String type);
+    List<SubscriptionBinding> findByUserNameAndType(String user, String type);
 }

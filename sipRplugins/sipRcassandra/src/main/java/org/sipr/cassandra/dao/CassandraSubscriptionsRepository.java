@@ -15,5 +15,5 @@ public interface CassandraSubscriptionsRepository extends SubscriptionBindingsRe
 
     @Override
     @Query("select * from subscriptions where username = ?0 and type = ?1")
-    List<CassandraSubscriptionBinding> findByUsernameAndType(@Param("username") String username, @Param("type") String type);
+    List<CassandraSubscriptionBinding> findByUserNameAndType(@Param("username") String username, @Param("type") String type);
 }

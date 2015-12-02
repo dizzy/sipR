@@ -45,7 +45,7 @@ public class SubscriptionBindingsServiceImpl implements SubscriptionBindingsServ
 
     @Override
     public List<SubscriptionBinding> findByUserNameAndType(String userName, String type) {
-        return (List<SubscriptionBinding>)(List<?>) subscriptionsRepository.findByUsernameAndType(userName, type);
+        return (List<SubscriptionBinding>)(List<?>) subscriptionsRepository.findByUserNameAndType(userName, type);
     }
 
     @Override
