@@ -21,7 +21,7 @@ public class MwiContentBuilder implements NotifyContentBuilder {
         ContentImpl content = new ContentImpl("");
 
         // TODO implement MailboxService, get some real data
-        content.addExtensionHeader(headerFactory.createHeader("Messages-Waiting", "yes"));
+        content.addExtensionHeader(headerFactory.createHeader("Messages-Waiting", "no"));
         content.addExtensionHeader(headerFactory.createHeader("Message-Account", request.getUser()));
         content.addExtensionHeader(headerFactory.createHeader("Voice-Message", "8/11 (0/0)"));
 

@@ -6,10 +6,13 @@ import org.sipr.SipRListener;
 import org.sipr.core.config.sip.TcpListenerConfiguration;
 import org.sipr.core.config.sip.TlsListenerConfiguration;
 import org.sipr.core.config.sip.WsListenerConfiguration;
+import org.sipr.request.notify.events.DndEvent;
+import org.sipr.request.notify.events.ForwardEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.Resource;
@@ -86,6 +89,14 @@ public class ServerConfiguration {
         }
 
         return sipListener;
+    }
+
+    @Bean
+    public Jaxb2Marshaller eventsNotifyMarshaller() {
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setMtomEnabled(true);
+        marshaller.setClassesToBeBound(ForwardEvent.class, DndEvent.class);
+        return marshaller;
     }
 
     @Bean

@@ -1,12 +1,10 @@
 package org.sipr.request.notify;
 
-import gov.nist.javax.sip.message.Content;
 import gov.nist.javax.sip.message.ContentImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sipr.request.handler.SubscriptionRequest;
 
 import javax.sip.RequestEvent;
 import javax.sip.header.ContentTypeHeader;
