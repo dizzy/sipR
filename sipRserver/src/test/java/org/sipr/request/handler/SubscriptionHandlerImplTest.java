@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sipr.core.domain.SubscriptionBinding;
 import org.sipr.core.service.SubscriptionBindingsService;
-import org.sipr.core.sip.request.processor.RequestException;
 import org.sipr.request.notify.NotifyContentBuilder;
 
 import javax.sip.*;
@@ -15,10 +14,10 @@ import javax.sip.header.*;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -149,35 +148,43 @@ public class SubscriptionHandlerImplTest {
         handler.subscriptionBindingsService = bindingsService;
         handler.handleRequest(requestEvent);
         verify(dialog).sendRequest(transaction);
-
-        when(sipProvider.getNewClientTransaction(notifyRequest)).thenThrow(new TransactionUnavailableException());
-        try {
-            handler.handleRequest(requestEvent);
-            fail();
-        } catch (RequestException ex) {
-            assertEquals(Integer.valueOf(Response.SERVER_INTERNAL_ERROR), ex.getErrorCode());
-        }
-
     }
 
     @Test
-    public void testUnknownEvent() {
-        SubscriptionRequest wrapper = new SubscriptionRequest();
-        wrapper.eventHeader = unknownEventHeader;
+    public void testHandleRequestException() throws Exception {
+        when(subscriptionRequestBuilder.getSubscriptionRequest(requestEvent)).thenReturn(wrapper);
+        when(messageFactory.createResponse(202, request)).thenThrow(new ParseException("", 1));
 
-        try {
-            handler.getNotifier(wrapper);
-            fail();
-        } catch (RequestException ex) {
-            assertEquals(Integer.valueOf(Response.NOT_IMPLEMENTED), ex.getErrorCode());
-        }
+        wrapper.response = 202;
+        handler.headerFactory = headerFactory;
+        handler.messageFactory = messageFactory;
+        handler.requestBuilder = subscriptionRequestBuilder;
+        handler.subscriptionBindingsService = bindingsService;
+
+        handler.handleRequest(requestEvent);
+        verifyNoMoreInteractions(bindingsService);
     }
 
     @Test
-    public void testGetNotifier() throws Exception {
-        SubscriptionRequest wrapper = new SubscriptionRequest();
-        wrapper.eventHeader = eventHeader;
-        assertEquals(contentBuilder, handler.getNotifier(wrapper));
+    public void testUnknownEvent() throws Exception {
+        SubscriptionRequest unknownWrapper = new SubscriptionRequest();
+        unknownWrapper.eventHeader = unknownEventHeader;
+        unknownWrapper.requestEvent = requestEvent;
+        unknownWrapper.serverTransaction = serverTransaction;
+        when(subscriptionRequestBuilder.getSubscriptionRequest(requestEvent)).thenReturn(unknownWrapper);
+        when(messageFactory.createResponse(Response.NOT_IMPLEMENTED, request)).thenReturn(response);
+
+        handler.requestBuilder = subscriptionRequestBuilder;
+        handler.messageFactory = messageFactory;
+        handler.handleRequest(requestEvent);
+
+        verify(messageFactory).createResponse(501, request);
+        verify(serverTransaction).sendResponse(response);
+        verifyNoMoreInteractions(messageFactory, serverTransaction);
+
+        when(messageFactory.createResponse(Response.NOT_IMPLEMENTED, request)).thenThrow(new ParseException("", 1));
+        handler.handleRequest(requestEvent);
+        verifyNoMoreInteractions(serverTransaction);
     }
 
     @Test

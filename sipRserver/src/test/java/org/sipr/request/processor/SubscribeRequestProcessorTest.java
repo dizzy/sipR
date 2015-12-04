@@ -15,6 +15,7 @@ import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,13 +44,13 @@ public class SubscribeRequestProcessorTest {
     @Mock
     WWWAuthenticateHeader authenticateHeader;
 
-    @Mock
-    Exception pex;
+    ParseException pex;
 
     @Before
     public void init() throws Exception {
         headers = Collections.singletonList(authenticateHeader);
         ex = new RequestException(Response.BAD_EXTENSION, headers);
+        pex = new ParseException("", 1);
     }
 
     @Test
@@ -63,15 +64,25 @@ public class SubscribeRequestProcessorTest {
     }
 
     @Test
-    public void testHandlerException() throws Exception {
-        doNothing().when(authValidator).validateRequest(requestEvent);
-        doThrow(ex).when(subscriptionHandler).handleRequest(requestEvent);
+    public void testValidatorParseException() throws Exception {
+        doThrow(pex).when(authValidator).validateRequest(requestEvent);
+        SubscribeRequestProcessor processor = new SubscribeRequestProcessor();
+        processor.authValidator = authValidator;
+        processor.sipMessageSender = sipMessageSender;
+        processor.processEvent(requestEvent);
+        verify(sipMessageSender).sendResponse(requestEvent, Response.SERVER_INTERNAL_ERROR);
+    }
+
+    @Test
+    public void testHandleEvent() throws Exception {
         SubscribeRequestProcessor processor = new SubscribeRequestProcessor();
         processor.authValidator = authValidator;
         processor.sipMessageSender = sipMessageSender;
         processor.subscriptionHandler = subscriptionHandler;
         processor.processEvent(requestEvent);
-        verify(sipMessageSender).sendResponse(requestEvent, ex.getErrorCode(), headers);
+        verify(authValidator).validateRequest(requestEvent);
+        verify(subscriptionHandler).handleRequest(requestEvent);
+        verifyNoMoreInteractions(sipMessageSender);
     }
 
     @Test

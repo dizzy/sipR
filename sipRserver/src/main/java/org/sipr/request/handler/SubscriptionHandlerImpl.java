@@ -50,18 +50,23 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
     }
 
     @Override
-    public void handleRequest(RequestEvent requestEvent) throws RequestException {
+    public void handleRequest(RequestEvent requestEvent) {
 
         try {
 
             SubscriptionRequest request = requestBuilder.getSubscriptionRequest(requestEvent);
 
-            NotifyContentBuilder notifyBuilder = getNotifier(request);
+            NotifyContentBuilder notifyBuilder = notifyBuildersMap.get(request.getEventType());
+            if (notifyBuilder == null) {
+                // create and send not implemented response
+                Response response = createNotImplementedResponse(request);
+                sendResponse(response, request);
+                return;
+            }
 
             // create and send subscription response
             Response response = createSubscriptionResponse(request);
-            ServerTransaction serverTransaction = request.getServerTransaction();
-            serverTransaction.sendResponse(response);
+            sendResponse(response, request);
 
             // update subscription in database
             SubscriptionBinding binding = updateSubscriptionStorage(request);
@@ -81,16 +86,13 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
             dialog.sendRequest(ct);
 
         } catch (InvalidArgumentException | ParseException | SipException ex) {
-            throw new RequestException(Response.SERVER_INTERNAL_ERROR);
+           LOGGER.error("Cannot process subscription: " + ex);
         }
     }
 
-    NotifyContentBuilder getNotifier(SubscriptionRequest request) throws RequestException {
-        NotifyContentBuilder notifyBuilder = notifyBuildersMap.get(request.getEventType());
-        if (notifyBuilder == null) {
-            throw new RequestException(Response.NOT_IMPLEMENTED);
-        }
-        return notifyBuilder;
+    void sendResponse(Response response, SubscriptionRequest request) throws InvalidArgumentException, SipException {
+        ServerTransaction serverTransaction = request.getServerTransaction();
+        serverTransaction.sendResponse(response);
     }
 
     SubscriptionBinding updateSubscriptionStorage(SubscriptionRequest request) {
@@ -110,6 +112,10 @@ public class SubscriptionHandlerImpl implements SubscriptionHandler {
             subscriptionBindingsService.deleteSubscription(subscription);
         }
         return subscription;
+    }
+
+    Response createNotImplementedResponse(SubscriptionRequest request) throws ParseException {
+        return messageFactory.createResponse(Response.NOT_IMPLEMENTED, request.getRequest());
     }
 
     Response createSubscriptionResponse(SubscriptionRequest request) throws ParseException {
