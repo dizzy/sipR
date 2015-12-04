@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.sip.*;
 import javax.sip.message.Request;
-import javax.sip.message.Response;
-import java.text.ParseException;
 
 @Component
 public class SubscribeRequestProcessor implements RequestProcessor {
@@ -38,8 +36,6 @@ public class SubscribeRequestProcessor implements RequestProcessor {
 
         } catch (RequestException ex) {
             sipMessageSender.sendResponse(requestEvent, ex.getErrorCode(), ex.getHeaders());
-        } catch (ParseException pex) {
-            sipMessageSender.sendResponse(requestEvent, Response.SERVER_INTERNAL_ERROR);
         }
     }
 

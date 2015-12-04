@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.sip.RequestEvent;
 import javax.sip.header.AuthorizationHeader;
+import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 import java.text.ParseException;
@@ -26,17 +27,22 @@ public class AuthValidator implements RequestValidator {
     SipAuthenticationService sipAuthenticationService;
 
     @Override
-    public void validateRequest(RequestEvent requestEvent) throws RequestException, ParseException {
+    public void validateRequest(RequestEvent requestEvent) throws RequestException {
         LOGGER.debug("Entering AuthValidator");
         Request request = requestEvent.getRequest();
         AuthorizationHeader authorizationHeader = (AuthorizationHeader) request.getHeader(AuthorizationHeader.NAME);
-
-        if (authorizationHeader == null) {
-            throw new RequestException(Response.UNAUTHORIZED, Collections.singletonList(sipAuthenticationService.createAuthHeader()));
-        } else {
-            if (!sipAuthenticationService.authenticateRequest(request)) {
-                throw new RequestException(Response.NOT_FOUND);
+        try {
+            if (authorizationHeader == null) {
+                WWWAuthenticateHeader header = sipAuthenticationService.createAuthHeader();
+                throw new RequestException(Response.UNAUTHORIZED, Collections.singletonList(header));
+            } else {
+                if (!sipAuthenticationService.authenticateRequest(request)) {
+                    throw new RequestException(Response.NOT_FOUND);
+                }
             }
+        } catch (ParseException pex) {
+            throw new RequestException(Response.SERVER_INTERNAL_ERROR);
         }
+
     }
 }

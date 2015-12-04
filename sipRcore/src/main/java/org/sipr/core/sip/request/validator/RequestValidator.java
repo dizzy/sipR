@@ -6,5 +6,5 @@ import javax.sip.RequestEvent;
 import java.text.ParseException;
 
 public interface RequestValidator {
-    void validateRequest(RequestEvent requestEvent) throws RequestException, ParseException;
+    void validateRequest(RequestEvent requestEvent) throws RequestException;
 }

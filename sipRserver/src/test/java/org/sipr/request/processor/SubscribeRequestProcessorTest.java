@@ -15,7 +15,6 @@ import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,13 +43,10 @@ public class SubscribeRequestProcessorTest {
     @Mock
     WWWAuthenticateHeader authenticateHeader;
 
-    ParseException pex;
-
     @Before
     public void init() throws Exception {
         headers = Collections.singletonList(authenticateHeader);
         ex = new RequestException(Response.BAD_EXTENSION, headers);
-        pex = new ParseException("", 1);
     }
 
     @Test
@@ -61,16 +57,6 @@ public class SubscribeRequestProcessorTest {
         processor.sipMessageSender = sipMessageSender;
         processor.processEvent(requestEvent);
         verify(sipMessageSender).sendResponse(requestEvent, ex.getErrorCode(), headers);
-    }
-
-    @Test
-    public void testValidatorParseException() throws Exception {
-        doThrow(pex).when(authValidator).validateRequest(requestEvent);
-        SubscribeRequestProcessor processor = new SubscribeRequestProcessor();
-        processor.authValidator = authValidator;
-        processor.sipMessageSender = sipMessageSender;
-        processor.processEvent(requestEvent);
-        verify(sipMessageSender).sendResponse(requestEvent, Response.SERVER_INTERNAL_ERROR);
     }
 
     @Test

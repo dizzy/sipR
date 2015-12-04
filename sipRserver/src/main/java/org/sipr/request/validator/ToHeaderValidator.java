@@ -16,7 +16,6 @@ import javax.sip.address.URI;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
-import java.text.ParseException;
 
 @Component
 @Order(value = 1)
@@ -27,7 +26,7 @@ public class ToHeaderValidator implements RequestValidator {
     SipUtils sipUtils;
 
     @Override
-    public void validateRequest(RequestEvent requestEvent) throws RequestException, ParseException {
+    public void validateRequest(RequestEvent requestEvent) throws RequestException {
         LOGGER.debug("Entering ToHeaderValidator");
         Request request = requestEvent.getRequest();
         ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);

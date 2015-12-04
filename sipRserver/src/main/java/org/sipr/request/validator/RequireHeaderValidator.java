@@ -26,13 +26,17 @@ public class RequireHeaderValidator implements RequestValidator {
     HeaderFactory headerFactory;
 
     @Override
-    public void validateRequest(RequestEvent requestEvent) throws RequestException, ParseException {
+    public void validateRequest(RequestEvent requestEvent) throws RequestException {
         LOGGER.debug("Enteirng RequireHeaderValidator");
         Request request = requestEvent.getRequest();
         ProxyRequireHeader requireHeader = (ProxyRequireHeader) request.getHeader(ProxyRequireHeader.NAME);
         if (requireHeader != null) {
-            Header unsupportedHeader = headerFactory.createUnsupportedHeader(requireHeader.getOptionTag());
-            throw new RequestException(Response.BAD_EXTENSION, Collections.singletonList(unsupportedHeader));
+            try {
+                Header unsupportedHeader = headerFactory.createUnsupportedHeader(requireHeader.getOptionTag());
+                throw new RequestException(Response.BAD_EXTENSION, Collections.singletonList(unsupportedHeader));
+            } catch (ParseException pex) {
+                throw new RequestException(Response.SERVER_INTERNAL_ERROR);
+            }
         }
     }
 }
