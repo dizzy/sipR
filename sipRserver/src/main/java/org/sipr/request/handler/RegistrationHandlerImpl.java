@@ -82,7 +82,8 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
                     if (expires == -1) {
                         expires = serverExpire;
                     }
-                    RegistrationBinding newBinding = registrationService.createRegistrationBinding(user, contactUri, callId, cseq, expires);
+                    String ua = sipUtils.extractUserAgent(request);
+                    RegistrationBinding newBinding = registrationService.createRegistrationBinding(user, contactUri, callId, cseq, expires, ua);
                     bindingsToSave.add(newBinding);
                     currentBindings.put(newBinding.getContact(), newBinding);
                 }

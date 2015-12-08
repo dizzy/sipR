@@ -60,7 +60,7 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires) {
-        return new MongoRegistrationBinding(user, contactUri, callId, cseq, expires);
+    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires, String ua) {
+        return new MongoRegistrationBinding(user, contactUri, callId, cseq, expires, ua);
     }
 }

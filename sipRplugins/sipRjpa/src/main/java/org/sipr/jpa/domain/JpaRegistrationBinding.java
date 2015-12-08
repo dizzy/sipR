@@ -19,11 +19,12 @@ public class JpaRegistrationBinding implements RegistrationBinding {
     String callId;
     Long cSeq;
     Integer expires;
+    String ua;
 
     public JpaRegistrationBinding() {
     }
 
-    public JpaRegistrationBinding(String userName, String contact, String callId, long cseq, int expires) {
+    public JpaRegistrationBinding(String userName, String contact, String callId, long cseq, int expires, String ua) {
         this.userName = userName;
         this.contact = contact;
         this.callId = callId;
@@ -73,5 +74,13 @@ public class JpaRegistrationBinding implements RegistrationBinding {
     @Override
     public void setCallId(String callId) {
         this.callId = callId;
+    }
+
+    public String getUa() {
+        return ua;
+    }
+
+    public void setUa(String ua) {
+        this.ua = ua;
     }
 }

@@ -159,9 +159,10 @@ public class RegistrationHandlerImplTest {
 
         when(sipUtils.extractContactHeaders(request)).thenReturn(contactHeaders);
         when(sipUtils.containsWildCardHeader(contactHeaders)).thenReturn(false);
+        when(sipUtils.extractUserAgent(request)).thenReturn("PolycomVVX-VVX_600-UA/5.1.3.1675");
 
         when(registrationService.createRegistrationBinding("200",
-                "sip:200@192.168.0.77:59177;ob", "qrscOPIIpEfXcqpOmHt6UdWn2Q6XJUiR", 5, 50)).thenReturn(newBinding);
+                "sip:200@192.168.0.77:59177;ob", "qrscOPIIpEfXcqpOmHt6UdWn2Q6XJUiR", 5, 50, "PolycomVVX-VVX_600-UA/5.1.3.1675")).thenReturn(newBinding);
         when(newBinding.getContact()).thenReturn("sip:200@192.168.0.77:59177;ob");
 
         RegistrationHandlerImpl registrationHandler = new RegistrationHandlerImpl();

@@ -26,12 +26,15 @@ public class MongoRegistrationBinding implements RegistrationBinding {
     @Indexed(name = "expireAt", expireAfterSeconds = 0)
     Date expireAt;
 
-    public MongoRegistrationBinding(String userName, String contact, String callId, long cseq, int expires) {
+    String ua;
+
+    public MongoRegistrationBinding(String userName, String contact, String callId, long cseq, int expires, String ua) {
         this.userName = userName;
         this.contact = contact;
         this.callId = callId;
         this.cseq = cseq;
         setExpires(expires);
+        this.ua = ua;
     }
 
     public String getUserName() {
@@ -73,6 +76,14 @@ public class MongoRegistrationBinding implements RegistrationBinding {
     public void setExpires(int expires) {
         this.expires = expires;
         expireAt = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(5 + expires).toInstant());
+    }
+
+    public String getUa() {
+        return ua;
+    }
+
+    public void setUa(String ua) {
+        this.ua = ua;
     }
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import static org.apache.commons.collections4.IteratorUtils.toList;
+import static org.apache.commons.lang3.StringUtils.*;
 
 @Component
 public class SipUtilsImpl implements SipUtils {
@@ -82,6 +83,15 @@ public class SipUtilsImpl implements SipUtils {
             return toList(headers);
         }
         return null;
+    }
+
+    @Override
+    public String extractUserAgent(Request request) {
+        UserAgentHeader uaHeader = (UserAgentHeader) request.getHeader(UserAgentHeader.NAME);
+        if (uaHeader != null) {
+            return join(uaHeader.getProduct(), ";");
+        }
+        return EMPTY;
     }
 
     public boolean containsWildCardHeader(List<ContactHeader> headers) {

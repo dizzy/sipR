@@ -29,6 +29,8 @@ public interface SipUtils {
 
     List<ContactHeader> extractContactHeaders(Request request);
 
+    String extractUserAgent(Request request);
+
     boolean containsWildCardHeader(List<ContactHeader> headers);
 
     String getFirstContactUri(Request request);

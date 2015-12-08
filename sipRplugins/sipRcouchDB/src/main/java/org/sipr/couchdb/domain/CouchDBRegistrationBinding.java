@@ -17,16 +17,19 @@ public class CouchDBRegistrationBinding extends CouchDbDocument implements Regis
 
     int expires;
 
+    String ua;
+
     public CouchDBRegistrationBinding() {
 
     }
 
-    public CouchDBRegistrationBinding(String userName, String contact, String callId, long cseq, int expires) {
+    public CouchDBRegistrationBinding(String userName, String contact, String callId, long cseq, int expires, String ua) {
         this.userName = userName;
         this.contact = contact;
         this.callId = callId;
         this.cseq = cseq;
         this.expires = expires;
+        this.ua = ua;
     }
 
     @Override
@@ -77,5 +80,13 @@ public class CouchDBRegistrationBinding extends CouchDbDocument implements Regis
     @Override
     public void setExpires(int expires) {
         this.expires = expires;
+    }
+
+    public String getUa() {
+        return ua;
+    }
+
+    public void setUa(String ua) {
+        this.ua = ua;
     }
 }
