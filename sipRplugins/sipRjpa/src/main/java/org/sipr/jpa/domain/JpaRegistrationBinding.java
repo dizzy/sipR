@@ -20,16 +20,19 @@ public class JpaRegistrationBinding implements RegistrationBinding {
     Long cSeq;
     Integer expires;
     String ua;
+    String server;
 
     public JpaRegistrationBinding() {
     }
 
-    public JpaRegistrationBinding(String userName, String contact, String callId, long cseq, int expires, String ua) {
+    public JpaRegistrationBinding(String userName, String contact, String callId, long cseq, int expires, String ua, String server) {
         this.userName = userName;
         this.contact = contact;
         this.callId = callId;
         this.cSeq = cseq;
         this.expires = expires;
+        this.ua = ua;
+        this.server = server;
     }
     public String getUserName() {
         return userName;
@@ -82,5 +85,13 @@ public class JpaRegistrationBinding implements RegistrationBinding {
 
     public void setUa(String ua) {
         this.ua = ua;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
     }
 }

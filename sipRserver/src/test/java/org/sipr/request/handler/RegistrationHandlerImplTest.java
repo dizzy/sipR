@@ -162,13 +162,14 @@ public class RegistrationHandlerImplTest {
         when(sipUtils.extractUserAgent(request)).thenReturn("PolycomVVX-VVX_600-UA/5.1.3.1675");
 
         when(registrationService.createRegistrationBinding("200",
-                "sip:200@192.168.0.77:59177;ob", "qrscOPIIpEfXcqpOmHt6UdWn2Q6XJUiR", 5, 50, "PolycomVVX-VVX_600-UA/5.1.3.1675")).thenReturn(newBinding);
+                "sip:200@192.168.0.77:59177;ob", "qrscOPIIpEfXcqpOmHt6UdWn2Q6XJUiR", 5, 50, "PolycomVVX-VVX_600-UA/5.1.3.1675", "sipRserver")).thenReturn(newBinding);
         when(newBinding.getContact()).thenReturn("sip:200@192.168.0.77:59177;ob");
 
         RegistrationHandlerImpl registrationHandler = new RegistrationHandlerImpl();
         registrationHandler.registrationService = registrationService;
         registrationHandler.sipUtils = sipUtils;
         registrationHandler.serverExpire = 50;
+        registrationHandler.serverName = "sipRserver";
         Collection<RegistrationBinding> bindings = registrationHandler.handleRequest(requestEvent);
 
         verify(registrationService).deleteBindings(Collections.singletonList(primaryBinding));
@@ -196,6 +197,7 @@ public class RegistrationHandlerImplTest {
 
         verify(primaryBinding).setCseq(5L);
         verify(primaryBinding).setExpires(50);
+        verify(primaryBinding).setServer("sipRserver");
         assertEquals(3, bindings.size());
 
         when(primaryContact.getExpires()).thenReturn(70);

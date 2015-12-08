@@ -18,5 +18,5 @@ public interface RegistrationBindingsService {
 
     void saveBinding(RegistrationBinding binding);
 
-    <T extends RegistrationBinding> T createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires, String ua);
+    <T extends RegistrationBinding> T createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires, String ua, String server);
 }

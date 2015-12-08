@@ -28,13 +28,17 @@ public class CassandraRegistrationBinding implements RegistrationBinding {
     @Column("ua")
     String ua;
 
-    public CassandraRegistrationBinding(String userName, String contact, String callId, long cseq, int expires, String ua) {
+    @Column("server")
+    String server;
+
+    public CassandraRegistrationBinding(String userName, String contact, String callId, long cseq, int expires, String ua, String server) {
         this.userName = userName;
         this.contact = contact;
         this.callId = callId;
         this.cseq = cseq;
         this.expires = expires;
         this.ua = ua;
+        this.server = server;
     }
 
     public String getUserName() {
@@ -83,6 +87,14 @@ public class CassandraRegistrationBinding implements RegistrationBinding {
 
     public void setUa(String ua) {
         this.ua = ua;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
     }
 
 }

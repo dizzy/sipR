@@ -72,7 +72,7 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires, String ua) {
-        return new CassandraRegistrationBinding(user, contactUri, callId, cseq, expires, ua);
+    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires, String ua, String server) {
+        return new CassandraRegistrationBinding(user, contactUri, callId, cseq, expires, ua, server);
     }
 }

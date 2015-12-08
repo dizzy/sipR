@@ -28,6 +28,9 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
     @Value("${sip.registration.expires}")
     int serverExpire;
 
+    @Value("${sip.server.name:sipRserver}")
+    String serverName;
+
     @Inject
     RegistrationBindingsService registrationService;
 
@@ -76,6 +79,7 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
                         }
                         binding.setCseq(cseq);
                         binding.setExpires(expires);
+                        binding.setServer(serverName);
                         bindingsToSave.add(binding);
                     }
                 } else {
@@ -83,7 +87,7 @@ public class RegistrationHandlerImpl implements RegistrationHandler {
                         expires = serverExpire;
                     }
                     String ua = sipUtils.extractUserAgent(request);
-                    RegistrationBinding newBinding = registrationService.createRegistrationBinding(user, contactUri, callId, cseq, expires, ua);
+                    RegistrationBinding newBinding = registrationService.createRegistrationBinding(user, contactUri, callId, cseq, expires, ua, serverName);
                     bindingsToSave.add(newBinding);
                     currentBindings.put(newBinding.getContact(), newBinding);
                 }

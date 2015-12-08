@@ -59,8 +59,8 @@ public class RegistrationBindingsServiceImpl implements RegistrationBindingsServ
     }
 
     @Override
-    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires, String ua) {
-        CouchDBRegistrationBinding regBinding = new CouchDBRegistrationBinding(user, contactUri, callId, cseq, expires, ua);
+    public RegistrationBinding createRegistrationBinding(String user, String contactUri, String callId, long cseq, int expires, String ua, String server) {
+        CouchDBRegistrationBinding regBinding = new CouchDBRegistrationBinding(user, contactUri, callId, cseq, expires, ua, server);
         saveBinding(regBinding);
         return regBinding;
     }
