@@ -20,7 +20,7 @@ public class SipDomainServiceImpl implements SipDomainService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SipDomainServiceImpl.class);
 
     @Value("#{'${sip.domains}'.split(',')}")
-    private List<String> sipDomain;
+    List<String> sipDomain;
 
     @Resource(name = "networkAddresses")
     Set<String> networkAddresses;
