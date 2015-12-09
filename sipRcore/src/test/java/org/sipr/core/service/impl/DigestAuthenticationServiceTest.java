@@ -26,7 +26,7 @@ public class DigestAuthenticationServiceTest {
     public void setUp() throws Exception {
         DigestAuthenticationService digestService = new DigestAuthenticationService();
 
-        when(user.getSipPassword()).thenReturn("12345");
+        when(user.getSipPassword()).thenReturn("e2e047fd0adc3246d8998c8f3f021328");
         when(userService.getUser("200")).thenReturn(user);
 
         digestService.userService = userService;

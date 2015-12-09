@@ -1,5 +1,5 @@
 USE sipr;
-INSERT into sipr.users (username, sip_pwd) VALUES ('200', '12345');
+INSERT into sipr.users (username, sip_pwd) VALUES ('200', 'e2e047fd0adc3246d8998c8f3f021328');
 
   INSERT into sipr.users (username, sip_pwd) VALUES ('10000', '1234');
   INSERT into sipr.users (username, sip_pwd) VALUES ('10001', '1234');

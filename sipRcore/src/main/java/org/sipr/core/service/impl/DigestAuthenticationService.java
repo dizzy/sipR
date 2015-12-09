@@ -64,11 +64,10 @@ public class DigestAuthenticationService implements AuthenticationService {
         }
 
         try {
-            User dbUser = (User) userService.getUser(user);
-            String A1 = details.getUsername() + ":" + details.getRealm() + ":" + dbUser.getSipPassword();
+            User dbUser = userService.getUser(user);
             String A2 = details.getMethod().toUpperCase() + ":" + details.getUri();
 
-            String KD = md5Hex(A1) + ":" + details.getNonce();
+            String KD = dbUser.getSipPassword() + ":" + details.getNonce();
             if (details.getCnonce() != null) {
                 KD += ":" + details.getCnonce();
             }
